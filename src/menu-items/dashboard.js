@@ -23,7 +23,7 @@ const dashboard = {
             id: 'events',
             title: 'Events',
             type: 'item',
-            url: '/sample-page',
+            url: '/events',
             icon: icons.IconBuildingStore,
             breadcrumbs: false
         },
