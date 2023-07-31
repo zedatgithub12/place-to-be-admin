@@ -290,7 +290,8 @@ const FirebaseRegister = ({ ...others }) => {
                                     size="large"
                                     type="submit"
                                     variant="contained"
-                                    color="secondary"
+                                    color="warning"
+                                    sx={{ backgroundColor: theme.palette.warning.dark, color: theme.palette.grey[900] }}
                                 >
                                     Sign up
                                 </Button>

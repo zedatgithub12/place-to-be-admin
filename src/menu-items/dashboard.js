@@ -15,77 +15,45 @@ const dashboard = {
             id: 'default',
             title: 'Dashboard',
             type: 'item',
-            url: '/dashboard/default',
+            url: '/',
             icon: icons.IconDashboard,
             breadcrumbs: false
         },
         {
-            id: 'shops',
-            title: 'Shops',
+            id: 'events',
+            title: 'Events',
             type: 'item',
             url: '/sample-page',
             icon: icons.IconBuildingStore,
             breadcrumbs: false
         },
         {
-            id: 'products',
-            title: 'Products',
-            type: 'collapse',
+            id: 'tickets',
+            title: 'Tickets',
+            type: 'item',
             url: '/sample-page',
             icon: icons.IconBox,
-            breadcrumbs: false,
-            children: [
-                {
-                    id: 'listproduct',
-                    title: 'List Product',
-                    type: 'item',
-                    url: '/icons/tabler-icons',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'addproduct',
-                    title: 'Add Product',
-                    type: 'item',
-                    url: '/icons/material-icons',
-                    breadcrumbs: false
-                }
-            ]
+            breadcrumbs: false
         },
         {
-            id: 'category',
-            title: 'Category',
-            type: 'collapse',
+            id: 'users',
+            title: 'Users',
+            type: 'item',
             url: '/sample-page',
             icon: icons.IconCategory,
-            breadcrumbs: false,
-            children: [
-                {
-                    id: 'listcategory',
-                    title: 'List Category',
-                    type: 'item',
-                    url: '/icons/tabler-icons',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'addcategory',
-                    title: 'Add Category',
-                    type: 'item',
-                    url: '/icons/material-icons',
-                    breadcrumbs: false
-                }
-            ]
+            breadcrumbs: false
         },
         {
-            id: 'sales',
-            title: 'Sales',
+            id: 'ads',
+            title: 'Ads Management',
             type: 'item',
             url: '/sample-page',
             icon: icons.IconTimeline,
             breadcrumbs: false
         },
         {
-            id: 'customers',
-            title: 'Customers',
+            id: 'customersupport',
+            title: 'Customer Support',
             type: 'item',
             url: '/sample-page',
             icon: icons.IconUsers,

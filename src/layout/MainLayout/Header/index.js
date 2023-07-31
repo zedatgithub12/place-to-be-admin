@@ -40,23 +40,21 @@ const Header = ({ handleLeftDrawerToggle }) => {
                             ...theme.typography.commonAvatar,
                             ...theme.typography.mediumAvatar,
                             transition: 'all .2s ease-in-out',
-                            background: theme.palette.secondary.light,
-                            color: theme.palette.secondary.dark,
+                            background: theme.palette.background.default,
+                            color: theme.palette.grey[900],
                             '&:hover': {
-                                background: theme.palette.secondary.dark,
-                                color: theme.palette.secondary.light
+                                background: theme.palette.warning.dark,
+                                color: theme.palette.grey[900]
                             }
                         }}
                         onClick={handleLeftDrawerToggle}
                         color="inherit"
                     >
-                        <IconMenu2 stroke={1.5} size="1.3rem" />
+                        <IconMenu2 stroke={1.5} size="1.6rem" />
                     </Avatar>
                 </ButtonBase>
             </Box>
 
-            {/* header search */}
-            <SearchSection />
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ flexGrow: 1 }} />
 

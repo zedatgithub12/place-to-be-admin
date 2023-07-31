@@ -106,11 +106,13 @@ const NotificationSection = () => {
                             ...theme.typography.commonAvatar,
                             ...theme.typography.mediumAvatar,
                             transition: 'all .2s ease-in-out',
-                            background: theme.palette.secondary.light,
-                            color: theme.palette.secondary.dark,
+                            background: theme.palette.warning.light,
+                            color: theme.palette.grey[800],
+                            borderWidth: 1,
+                            borderColor: theme.palette.warning.main,
                             '&[aria-controls="menu-list-grow"],&:hover': {
-                                background: theme.palette.secondary.dark,
-                                color: theme.palette.secondary.light
+                                background: theme.palette.warning.dark,
+                                color: theme.palette.grey[900]
                             }
                         }}
                         ref={anchorRef}
@@ -119,7 +121,7 @@ const NotificationSection = () => {
                         onClick={handleToggle}
                         color="inherit"
                     >
-                        <IconBell stroke={1.5} size="1.3rem" />
+                        <IconBell stroke={1.5} size="1.4rem" />
                     </Avatar>
                 </ButtonBase>
             </Box>
@@ -149,7 +151,7 @@ const NotificationSection = () => {
                                     <Grid container direction="column" spacing={2}>
                                         <Grid item xs={12}>
                                             <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 2, px: 2 }}>
-                                                <Grid item>
+                                                <Grid item paddingRight={4}>
                                                     <Stack direction="row" spacing={2}>
                                                         <Typography variant="subtitle1">All Notification</Typography>
                                                         <Chip
@@ -157,7 +159,8 @@ const NotificationSection = () => {
                                                             label="01"
                                                             sx={{
                                                                 color: theme.palette.background.default,
-                                                                bgcolor: theme.palette.warning.dark
+                                                                bgcolor: theme.palette.error.main,
+                                                                marginRight: 4
                                                             }}
                                                         />
                                                     </Stack>
@@ -198,7 +201,9 @@ const NotificationSection = () => {
                                                         <Divider sx={{ my: 0 }} />
                                                     </Grid>
                                                 </Grid>
-                                                <NotificationList />
+                                                {/* 
+                                                a component containing a design and dummy data of notification list 
+                                                <NotificationList /> */}
                                             </PerfectScrollbar>
                                         </Grid>
                                     </Grid>

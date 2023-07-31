@@ -1,8 +1,8 @@
 {
-    "name": "berry-free-material-react-cra",
-    "version": "3.3.1",
+    "name": "place-to-be-ethiopia-admin",
+    "version": "1.0.0",
     "private": true,
-    "homepage": "https://berrydashboard.io/free",
+    "homepage": "https://placetobeethiopia.com/",
     "dependencies": {
         "@emotion/cache": "^11.9.3",
         "@emotion/react": "^11.9.3",
