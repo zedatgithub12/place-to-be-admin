@@ -28,11 +28,40 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useTheme } from '@mui/material';
+import './eventStyle.css';
 
 const MyEvents = ({ events }) => {
     const theme = useTheme();
-    const filteredEvents = events;
     const [tabValue, setTabValue] = useState('one');
+    const tabCounters = {
+        featured: 0
+    };
+
+    const [page, setPage] = useState(2);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const filterEvents = (tab) => {
+        tabCounters.featured = events.filter((event) => event.status === 'featured').length;
+        switch (tab) {
+            case 'featured':
+                return events.filter((event) => event.status === 'featured');
+            case 'declined':
+                return events.filter((event) => event.status === 'declined');
+            default:
+                return events;
+        }
+    };
+
+    const filteredEvents = filterEvents(tabValue);
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
@@ -41,13 +70,40 @@ const MyEvents = ({ events }) => {
     return (
         <Grid container>
             <Box sx={{ width: '100%' }}>
-                <Tabs variant="fullWidth" value={tabValue} onChange={handleTabChange}>
-                    <Tab value="one" label="Featured" />
-                    <Tab value="two" label="Declined" />
+                <Tabs
+                    variant="fullWidth"
+                    value={tabValue}
+                    sx={{ height: '50px', display: 'flex', alignItems: 'center' }}
+                    className="custom-tabs"
+                    onChange={handleTabChange}
+                >
+                    <Tab
+                        value="featured"
+                        label="Featured"
+                        icon={
+                            <Box
+                                sx={{
+                                    minWidth: '20px',
+                                    height: '20px',
+                                    backgroundColor: 'red',
+                                    color: 'white',
+                                    borderRadius: '10px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                                className="counter"
+                            >
+                                {tabCounters.featured}
+                            </Box>
+                        }
+                        iconPosition="end"
+                    />
+                    <Tab value="declined" label="Declined" />
                 </Tabs>
             </Box>
 
-            <Grid item display={'flex'} flexDirection={'column'} justifyContent={'space-between'} sx={{ height: '80%' }}>
+            <Grid item display={'flex'} flexDirection={'column'} justifyContent={'space-between'} sx={{ width: '100%', height: '80%' }}>
                 <Grid item className="event-table">
                     <TableContainer fullWidth component={Paper}>
                         <TableHead fullWidth>
@@ -63,7 +119,7 @@ const MyEvents = ({ events }) => {
                                     <TableCell component="th" scope="row">
                                         {event.name}
                                     </TableCell>
-                                    <TableCell align="right">{event.createdDate}</TableCell>
+                                    <TableCell align="right">{event.addedDate}</TableCell>
                                     <TableCell align="right">
                                         <Box sx={{ minWidth: 100 }}>
                                             <FormControl fullWidth size="small">
@@ -85,6 +141,16 @@ const MyEvents = ({ events }) => {
                             ))}
                         </TableBody>
                     </TableContainer>
+                    <TableFooter>
+                        <TablePagination
+                            component="div"
+                            count={100}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                    </TableFooter>
                 </Grid>
             </Grid>
         </Grid>

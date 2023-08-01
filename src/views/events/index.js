@@ -11,7 +11,7 @@ import {
     Select,
     MenuItem,
     Box,
-    Badge
+    Button
 } from '@mui/material';
 import {
     Table,
@@ -24,13 +24,16 @@ import {
     NativeSelect,
     TableFooter
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import { Search, ArrowForward, MoreVert } from '@mui/icons-material';
 import { useState, useMemo, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import events from 'data/events';
-import AllEvents from './allEvents';
+import AllEvents from './allEvents'; // dummy data for panel 1
+import myEvents from 'data/myEvents'; // dummy data for panel 2
+// i assumed that events for both panels are different
 import MyEvents from './myEvents';
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -77,6 +80,13 @@ const Events = () => {
 
     return (
         <Grid container display={'flex'} flexDirection={'column'}>
+            <Grid item m={1} display={'flex'} justifyContent="space-between">
+                <Typography variant="h2">Events</Typography>
+                <Button variant="contained" startIcon={<AddIcon />}>
+                    Add Events
+                </Button>
+            </Grid>
+            <Divider sx={{ marginBottom: '20px' }} />
             <Grid item m={1} display={'flex'}>
                 <Paper component="form" sx={{ display: 'flex', alignItems: 'center', width: 400 }}>
                     <IconButton sx={{ p: '10px' }} aria-label="menu">
@@ -97,26 +107,23 @@ const Events = () => {
                 </Paper>
                 {/* organizer option */}
                 <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    <InputLabel id="select-label">Organizer</InputLabel>
                     <Select id="organizer-option" value={organizer} onChange={(event) => handleOptionChange(event, setOrganizer)}>
-                        <MenuItem value={'all'}>All</MenuItem>
+                        <MenuItem value={'all'}>Organizer</MenuItem>
                         <MenuItem value={'ABC Events'}>ABC Events</MenuItem>
                     </Select>
                 </FormControl>
 
                 {/* category option */}
                 <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    <InputLabel id="select-label">Category</InputLabel>
                     <Select id="organizer-option" value={category} onChange={(event) => handleOptionChange(event, setCategory)}>
-                        <MenuItem value={'all'}>All</MenuItem>
+                        <MenuItem value={'all'}>Category</MenuItem>
                     </Select>
                 </FormControl>
 
                 {/* event-type option */}
                 <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    <InputLabel id="select-label">Event Type</InputLabel>
                     <Select id="organizer-option" value={eventtype} onChange={(event) => handleOptionChange(event, setEventType)}>
-                        <MenuItem value={'all'}>All</MenuItem>
+                        <MenuItem value={'all'}>Event Type</MenuItem>
                     </Select>
                 </FormControl>
             </Grid>
@@ -125,7 +132,7 @@ const Events = () => {
                     <AllEvents events={filteredEventsData} />
                 </MainCard>
                 <MainCard sx={{ flex: 3, display: 'flex', flexDirection: 'column' }}>
-                    <MyEvents events={filteredEventsData} />
+                    <MyEvents events={myEvents} />
                 </MainCard>
             </Grid>
         </Grid>
