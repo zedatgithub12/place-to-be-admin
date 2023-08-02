@@ -31,10 +31,10 @@ import { useTheme } from '@mui/material/styles';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import events from 'data/events';
-import AllEvents from './allEvents'; // dummy data for panel 1
+import LeftEventPanel from './LeftEventPanel';
 import myEvents from 'data/myEvents'; // dummy data for panel 2
 // i assumed that events for both panels are different
-import MyEvents from './myEvents';
+import RightEventPanel from './RightEventPanel';
 
 // ==============================|| SAMPLE PAGE ||============================== //
 
@@ -46,6 +46,22 @@ const Events = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredEventsData, setFilteredEventsData] = useState(events);
+    const options = {
+        organizers: [],
+        eventtypes: ['free', 'paid'],
+        category: []
+    };
+
+    const collectDistinctOptions = (events) => {
+        events.forEach((event) => {
+            if (!options.organizers.includes(event.event_organizer)) {
+                options.organizers.push(event.event_organizer);
+            }
+            if (!options.category.includes(event.category)) {
+                options.category.push(event.category);
+            }
+        });
+    };
 
     const handleSearchInputChange = (event) => {
         setSearchQuery(event.target.value);
@@ -64,16 +80,16 @@ const Events = () => {
 
     const filterData = () => {
         const filteredData = events
-            .filter((event) => event.name.toLowerCase().includes(searchQuery.toLowerCase()))
+            .filter((event) => event.event_name.toLowerCase().includes(searchQuery.toLowerCase()))
             .filter(
                 (event) =>
-                    (organizer === 'all' || event.organizer === organizer) &&
-                    (category === 'all' || event.type === category) &&
-                    (eventtype === 'all' || event.type === eventtype)
+                    (organizer === 'all' || event.event_organizer === organizer) &&
+                    (category === 'all' || event.category === category) &&
+                    (eventtype === 'all' || event.event_type === eventtype)
             );
         setFilteredEventsData(filteredData);
     };
-
+    collectDistinctOptions(events); // this collect organizers and categories from the event data
     useEffect(() => {
         filterData();
     }, [searchQuery, organizer, category, eventtype]);
@@ -87,53 +103,67 @@ const Events = () => {
                 </Button>
             </Grid>
             <Divider sx={{ marginBottom: '20px' }} />
-            <Grid item m={1} display={'flex'}>
-                <Paper component="form" sx={{ display: 'flex', alignItems: 'center', width: 400 }}>
-                    <IconButton sx={{ p: '10px' }} aria-label="menu">
-                        <Search />
-                    </IconButton>
-                    <InputBase
-                        size="small"
-                        sx={{ flex: 1 }}
-                        placeholder="Search"
-                        inputProps={{ 'aria-label': 'search' }}
-                        value={searchQuery}
-                        onChange={handleSearchInputChange}
-                    />
-                    <Divider sx={{ height: 25, m: 0.5 }} orientation="vertical" />
-                    <IconButton type="button" sx={{ p: '10px' }} aria-label="forward" onClick={handleSearchButtonClick}>
-                        <ArrowForward />
-                    </IconButton>
-                </Paper>
+            <Grid container mb={1} sx={{ display: 'flex', alignItems: 'center' }}>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <Paper component="form" sx={{ display: 'flex', alignItems: 'center', maxWidth: 400, height: '50px' }}>
+                        <InputBase
+                            sx={{ flex: 1, paddingLeft: '20px' }}
+                            placeholder="Search"
+                            inputProps={{ 'aria-label': 'search' }}
+                            value={searchQuery}
+                            onChange={handleSearchInputChange}
+                        />
+                        <Divider sx={{ height: 25, m: 0.5 }} orientation="vertical" />
+                        <IconButton aria-label="menu">
+                            <Search />
+                        </IconButton>
+                    </Paper>
+                </Grid>
                 {/* organizer option */}
-                <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    <Select id="organizer-option" value={organizer} onChange={(event) => handleOptionChange(event, setOrganizer)}>
-                        <MenuItem value={'all'}>Organizer</MenuItem>
-                        <MenuItem value={'ABC Events'}>ABC Events</MenuItem>
-                    </Select>
-                </FormControl>
+                <Grid item xs={12} sm={12} md={6} lg={4} sx={{ marginLeft: { lg: 1 } }} display={'flex'}>
+                    <FormControl sx={{ m: 1, maxWidth: 120, marginLeft: { sm: 0 } }}>
+                        <Select id="organizer-option" value={organizer} onChange={(event) => handleOptionChange(event, setOrganizer)}>
+                            <MenuItem value={'all'}>Organizer</MenuItem>
+                            {options.organizers.map((organizer) => (
+                                <MenuItem key={organizer} value={organizer}>
+                                    {organizer}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
-                {/* category option */}
-                <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    <Select id="organizer-option" value={category} onChange={(event) => handleOptionChange(event, setCategory)}>
-                        <MenuItem value={'all'}>Category</MenuItem>
-                    </Select>
-                </FormControl>
+                    {/* category option */}
+                    <FormControl sx={{ m: 1, maxWidth: 120 }}>
+                        <Select id="organizer-option" value={category} onChange={(event) => handleOptionChange(event, setCategory)}>
+                            <MenuItem value={'all'}>Category</MenuItem>
+                            {options.category.map((category) => (
+                                <MenuItem key={category} value={category}>
+                                    {category}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
-                {/* event-type option */}
-                <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    <Select id="organizer-option" value={eventtype} onChange={(event) => handleOptionChange(event, setEventType)}>
-                        <MenuItem value={'all'}>Event Type</MenuItem>
-                    </Select>
-                </FormControl>
+                    {/* event-type option */}
+                    <FormControl sx={{ m: 1, maxWidth: 120 }}>
+                        <Select id="organizer-option" value={eventtype} onChange={(event) => handleOptionChange(event, setEventType)}>
+                            <MenuItem value={'all'}>Event Type</MenuItem>
+                            {options.eventtypes.map((eventtype) => (
+                                <MenuItem key={eventtype} value={eventtype}>
+                                    {eventtype}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
             </Grid>
-            <Grid item sx={{ display: 'flex', height: '80vh' }}>
-                <MainCard sx={{ flex: 5, marginRight: 3 }}>
-                    <AllEvents events={filteredEventsData} />
-                </MainCard>
-                <MainCard sx={{ flex: 3, display: 'flex', flexDirection: 'column' }}>
-                    <MyEvents events={myEvents} />
-                </MainCard>
+            <Grid container sx={{ display: 'flex' }}>
+                <Grid item sx={{ flex: 5, marginRight: { lg: 3, xl: 3 }, marginBottom: { xs: 1, sm: 1 } }}>
+                    <LeftEventPanel events={filteredEventsData} />
+                </Grid>
+                <Grid item sx={{ flex: 3, display: 'flex', flexDirection: 'column' }}>
+                    <RightEventPanel events={events} />
+                </Grid>
             </Grid>
         </Grid>
     );

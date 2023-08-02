@@ -14,7 +14,8 @@ import {
     Badge,
     Tabs,
     Tab,
-    makeStyles
+    makeStyles,
+    Card
 } from '@mui/material';
 import {
     Table,
@@ -28,16 +29,18 @@ import {
     TableFooter
 } from '@mui/material';
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useTheme } from '@mui/material/styles';
 import { MoreVert } from '@mui/icons-material';
 
 import './eventStyle.css';
 
-const AllEvents = ({ events }) => {
+const LeftEventPanel = ({ events }) => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const [page, setPage] = useState(0); //for pagination
     const [rowsPerPage, setRowsPerPage] = useState(5); //for pagination
-    const [currentPage, setCurrentPage] = useState(1); //for pagination
+    const [currentPage, setCurrentPage] = useState(0); //for pagination
 
     const [tabValue, setTabValue] = useState('one');
     const tabCounters = {
@@ -54,22 +57,22 @@ const AllEvents = ({ events }) => {
 
         (tabCounters.featuring = events.filter((event) => event.priority === 1).length),
             (tabCounters.thisWeek = events.filter(
-                (event) => new Date(event.startDate) <= today && new Date(event.endDate) >= today
+                (event) => new Date(event.start_date) > today && new Date(event.end_date) <= nextSunday
             ).length),
-            (tabCounters.upcoming = events.filter((event) => new Date(event.startDate) > nextSunday).length),
+            (tabCounters.upcoming = events.filter((event) => new Date(event.start_date) > nextSunday).length),
             (tabCounters.happening = events.filter(
-                (event) => new Date(event.startDate) <= today && new Date(event.endDate) >= today
+                (event) => new Date(event.start_date) <= today && new Date(event.end_date) >= today
             ).length);
 
         switch (tab) {
             case 'featuring':
                 return events.filter((event) => event.priority === 1);
             case 'happening':
-                return events.filter((event) => new Date(event.startDate) <= today && new Date(event.endDate) >= today);
+                return events.filter((event) => new Date(event.start_date) <= today && new Date(event.end_date) >= today);
             case 'thisWeek':
-                return events.filter((event) => new Date(event.startDate) > today && new Date(event.endDate) <= nextSunday);
+                return events.filter((event) => new Date(event.start_date) > today && new Date(event.end_date) <= nextSunday);
             case 'upcoming':
-                return events.filter((event) => new Date(event.startDate) > nextSunday);
+                return events.filter((event) => new Date(event.start_date) > nextSunday);
             default:
                 return events;
         }
@@ -83,15 +86,14 @@ const AllEvents = ({ events }) => {
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
+        setCurrentPage(newPage + 1);
     };
-
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
     };
 
     const getEventsByPage = (events, page, rowsPerPage) => {
-        const startIndex = (page - 1) * rowsPerPage;
+        const startIndex = page * rowsPerPage;
         const endIndex = startIndex + rowsPerPage;
         return events.slice(startIndex, endIndex);
     };
@@ -101,7 +103,7 @@ const AllEvents = ({ events }) => {
     }, [filteredEvents, currentPage, rowsPerPage]);
 
     return (
-        <Grid container>
+        <Card>
             <Box sx={{ width: '100%' }}>
                 <Tabs
                     variant="fullWidth"
@@ -119,8 +121,8 @@ const AllEvents = ({ events }) => {
                                 sx={{
                                     minWidth: '20px',
                                     height: '20px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
+                                    backgroundColor: '#F2F2F2',
+                                    color: 'black',
                                     borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -141,8 +143,8 @@ const AllEvents = ({ events }) => {
                                 sx={{
                                     minWidth: '20px',
                                     height: '20px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
+                                    backgroundColor: '#F2F2F2',
+                                    color: 'black',
                                     borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -163,8 +165,8 @@ const AllEvents = ({ events }) => {
                                 sx={{
                                     minWidth: '20px',
                                     height: '20px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
+                                    backgroundColor: '#F2F2F2',
+                                    color: 'black',
                                     borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -185,8 +187,8 @@ const AllEvents = ({ events }) => {
                                 sx={{
                                     minWidth: '20px',
                                     height: '20px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
+                                    backgroundColor: '#F2F2F2',
+                                    color: 'black',
                                     borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -201,8 +203,8 @@ const AllEvents = ({ events }) => {
                     />
                 </Tabs>
             </Box>
-            <Grid item display={'flex'} flexDirection={'column'} justifyContent={'space-between'} sx={{ width: '100%', height: '80%' }}>
-                <TableContainer>
+            <Grid item display={'flex'} flexDirection={'column'} sx={{ width: '100%' }}>
+                <TableContainer component={Paper} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <Table aria-label="events table">
                         <TableHead>
                             <TableRow>
@@ -215,15 +217,19 @@ const AllEvents = ({ events }) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredEvents.map((event) => (
-                                <TableRow key={event.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            {visibleRows.map((event) => (
+                                <TableRow
+                                    key={event.id}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                                    onClick={() => navigate('/event-detail', { state: { ...event } })}
+                                >
                                     <TableCell component="th" scope="row">
-                                        {event.name}
+                                        {event.event_name}
                                     </TableCell>
-                                    <TableCell align="right">{event.organizer}</TableCell>
-                                    <TableCell align="right">{event.type}</TableCell>
-                                    <TableCell align="right">{event.startDate}</TableCell>
-                                    <TableCell align="right">{event.endDate}</TableCell>
+                                    <TableCell align="right">{event.event_organizer}</TableCell>
+                                    <TableCell align="right">{event.event_type}</TableCell>
+                                    <TableCell align="right">{event.start_date}</TableCell>
+                                    <TableCell align="right">{event.end_date}</TableCell>
                                     <TableCell align="right">
                                         <IconButton
                                             aria-label="more"
@@ -246,14 +252,14 @@ const AllEvents = ({ events }) => {
                         component="div"
                         count={filteredEvents.length}
                         rowsPerPage={rowsPerPage}
-                        page={page}
+                        page={currentPage}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />
                 </TableFooter>
             </Grid>
-        </Grid>
+        </Card>
     );
 };
 
-export default AllEvents;
+export default LeftEventPanel;
