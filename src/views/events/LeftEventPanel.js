@@ -40,7 +40,6 @@ const LeftEventPanel = ({ events }) => {
     const navigate = useNavigate();
     const [page, setPage] = useState(0); //for pagination
     const [rowsPerPage, setRowsPerPage] = useState(5); //for pagination
-    const [currentPage, setCurrentPage] = useState(0); //for pagination
 
     const [tabValue, setTabValue] = useState('one');
     const tabCounters = {
@@ -86,7 +85,6 @@ const LeftEventPanel = ({ events }) => {
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
-        setCurrentPage(newPage + 1);
     };
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
@@ -99,8 +97,8 @@ const LeftEventPanel = ({ events }) => {
     };
 
     const visibleRows = useMemo(() => {
-        return getEventsByPage(filteredEvents, currentPage, rowsPerPage);
-    }, [filteredEvents, currentPage, rowsPerPage]);
+        return getEventsByPage(filteredEvents, page, rowsPerPage);
+    }, [filteredEvents, page, rowsPerPage]);
 
     return (
         <Card>
@@ -252,7 +250,7 @@ const LeftEventPanel = ({ events }) => {
                         component="div"
                         count={filteredEvents.length}
                         rowsPerPage={rowsPerPage}
-                        page={currentPage}
+                        page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />

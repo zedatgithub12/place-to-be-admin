@@ -39,7 +39,6 @@ const RightEventPanel = ({ events }) => {
     const [tabValue, setTabValue] = useState('one');
     const [page, setPage] = useState(0); //for pagination
     const [rowsPerPage, setRowsPerPage] = useState(5); //for pagination
-    const [currentPage, setCurrentPage] = useState(0); //for pagination
     const tabCounters = {
         featured: 0
     };
@@ -60,10 +59,9 @@ const RightEventPanel = ({ events }) => {
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
-        setCurrentPage(newPage + 1);
     };
     const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+        setRowsPerPage(parseInt(event.target.value));
     };
 
     const getEventsByPage = (events, page, rowsPerPage) => {
@@ -73,8 +71,8 @@ const RightEventPanel = ({ events }) => {
     };
 
     const visibleRows = useMemo(() => {
-        return getEventsByPage(filteredEvents, currentPage, rowsPerPage);
-    }, [filteredEvents, currentPage, rowsPerPage]);
+        return getEventsByPage(filteredEvents, page, rowsPerPage);
+    }, [filteredEvents, page, rowsPerPage]);
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
@@ -162,7 +160,7 @@ const RightEventPanel = ({ events }) => {
                         component="div"
                         count={filteredEvents.length}
                         rowsPerPage={rowsPerPage}
-                        page={currentPage}
+                        page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />

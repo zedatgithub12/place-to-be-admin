@@ -1,5 +1,6 @@
 .custom-tabs .MuiTabs-indicator {
     background-color: white;
+    border-radius: 10px !important;
 }
 
 .custom-tabs .Mui-selected {
