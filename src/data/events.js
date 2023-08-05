@@ -5,11 +5,20 @@ const Events = [
         event_status: 'featured',
         event_type: 'Social',
         start_date: '2023-08-15',
+        start_time: '12:00',
+        end_time: '02:00',
         end_date: '2023-08-15',
         added_date: '2023-08-02',
         priority: 1,
         category: 'Celebration',
-        event_organizer: 'John Doe'
+        event_organizer: 'John Doe',
+        event_address: '123 Main St',
+        event_venue: 'Party Hall',
+        address_latitude: 40.7128,
+        address_longitude: -74.006,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 2,
@@ -18,10 +27,19 @@ const Events = [
         event_type: 'Work',
         start_date: '2023-08-03',
         end_date: '2023-08-03',
+        start_time: '2:00',
+        end_time: '05:30',
         added_date: '2023-08-02',
         priority: 2,
         category: 'Meeting',
-        event_organizer: 'Jane Smith'
+        event_organizer: 'Jane Smith',
+        event_address: '456 Business Ave',
+        event_venue: 'Conference Room',
+        address_latitude: 37.7749,
+        address_longitude: -122.4194,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 3,
@@ -30,10 +48,19 @@ const Events = [
         event_type: 'Work',
         start_date: '2023-09-20',
         end_date: '2023-09-22',
+        start_time: '10:00',
+        end_time: '12:00',
         added_date: '2023-08-02',
         priority: 1,
         category: 'Meeting',
-        event_organizer: 'ABC Events'
+        event_organizer: 'ABC Events',
+        event_address: '789 Conference Blvd',
+        event_venue: 'Convention Center',
+        address_latitude: 41.8781,
+        address_longitude: -87.6298,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 4,
@@ -42,10 +69,19 @@ const Events = [
         event_type: 'Personal',
         start_date: '2023-10-10',
         end_date: '2023-10-20',
+        start_time: '10:00',
+        end_time: '12:00',
         added_date: '2023-08-02',
         priority: 2,
         category: 'Leisure',
-        event_organizer: 'Yourself'
+        event_organizer: 'Yourself',
+        event_address: '789 Conference Blvd',
+        event_venue: 'Convention Center',
+        address_latitude: 41.8781,
+        address_longitude: -87.6298,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 5,
@@ -54,10 +90,19 @@ const Events = [
         event_type: 'Business',
         start_date: '2023-09-05',
         end_date: '2023-09-05',
+        start_time: '10:00',
+        end_time: '12:00',
         added_date: '2023-08-02',
         priority: 1,
         category: 'Marketing',
-        event_organizer: 'XYZ Company'
+        event_organizer: 'XYZ Company',
+        event_address: '789 Conference Blvd',
+        event_venue: 'Convention Center',
+        address_latitude: 41.8781,
+        address_longitude: -87.6298,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 6,
@@ -66,10 +111,19 @@ const Events = [
         event_type: 'Social',
         start_date: '2023-12-25',
         end_date: '2023-12-25',
+        start_time: '10:00',
+        end_time: '12:00',
         added_date: '2023-08-02',
         priority: 2,
         category: 'Celebration',
-        event_organizer: 'Family Members'
+        event_organizer: 'Family Members',
+        event_address: '789 Conference Blvd',
+        event_venue: 'Convention Center',
+        address_latitude: 41.8781,
+        address_longitude: -87.6298,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 7,
@@ -78,10 +132,19 @@ const Events = [
         event_type: 'Educational',
         start_date: '2023-08-10',
         end_date: '2023-08-10',
+        start_time: '10:00',
+        end_time: '12:00',
         added_date: '2023-08-02',
         priority: 1,
         category: 'Training',
-        event_organizer: 'Professional Institute'
+        event_organizer: 'Professional Institute',
+        event_address: '789 Conference Blvd',
+        event_venue: 'Convention Center',
+        address_latitude: 41.8781,
+        address_longitude: -87.6298,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 8,
@@ -90,10 +153,19 @@ const Events = [
         event_type: 'Social',
         start_date: '2023-09-30',
         end_date: '2023-09-30',
+        start_time: '10:00',
+        end_time: '12:00',
         added_date: '2023-08-02',
         priority: 1,
         category: 'Charity',
-        event_organizer: 'Charity Organization'
+        event_organizer: 'Charity Organization',
+        event_address: '789 Conference Blvd',
+        event_venue: 'Convention Center',
+        address_latitude: 41.8781,
+        address_longitude: -87.6298,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 9,
@@ -102,10 +174,19 @@ const Events = [
         event_type: 'Work',
         start_date: '2023-08-05',
         end_date: '2023-08-05',
+        start_time: '10:00',
+        end_time: '12:00',
         added_date: '2023-08-02',
         priority: 2,
         category: 'Deadline',
-        event_organizer: 'Your Team Lead'
+        event_organizer: 'Your Team Lead',
+        event_address: '789 Conference Blvd',
+        event_venue: 'Convention Center',
+        address_latitude: 41.8781,
+        address_longitude: -87.6298,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     },
     {
         id: 10,
@@ -114,10 +195,19 @@ const Events = [
         event_type: 'Entertainment',
         start_date: '2023-11-20',
         end_date: '2023-11-20',
+        start_time: '10:00',
+        end_time: '12:00',
         added_date: '2023-08-02',
         priority: 1,
         category: 'Music',
-        event_organizer: 'Music Productions Inc.'
+        event_organizer: 'Music Productions Inc.',
+        event_address: '789 Conference Blvd',
+        event_venue: 'Convention Center',
+        address_latitude: 41.8781,
+        address_longitude: -87.6298,
+        event_image: 'https://picsum.photos/200',
+        event_description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et facilisis justo, nec faucibus nunc. Phasellus ultricies, tellus nec pellentesque sollicitudin, elit eros facilisis eros, nec aliquam urna est a justo. Nunc fermentum euismod ultrices. Sed vitae neque tincidunt, suscipit nulla at, gravida nulla. Nulla hendrerit neque eget volutpat varius. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce commodo ex a laoreet interdum. Sed eu sagittis eros. Integer dictum vel enim ac lacinia. Nullam sagittis dolor et ex laoreet, vitae fermentum ex euismod.'
     }
 ];
 

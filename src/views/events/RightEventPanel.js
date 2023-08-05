@@ -96,8 +96,8 @@ const RightEventPanel = ({ events }) => {
                                 sx={{
                                     minWidth: '20px',
                                     height: '20px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
+                                    backgroundColor: '#F2F2F2',
+                                    color: 'black',
                                     borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',

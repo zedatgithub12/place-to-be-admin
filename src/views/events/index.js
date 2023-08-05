@@ -52,16 +52,15 @@ const Events = () => {
         category: []
     };
 
-    const collectDistinctOptions = (events) => {
-        events.forEach((event) => {
-            if (!options.organizers.includes(event.event_organizer)) {
-                options.organizers.push(event.event_organizer);
-            }
-            if (!options.category.includes(event.category)) {
-                options.category.push(event.category);
-            }
-        });
-    };
+    // const collectDistinctOptions = (events) => {
+    // events.forEach((event) => {
+    //     if (!options.organizers.includes(event.event_organizer)) {
+    //         options.organizers.push(event.event_organizer);
+    //     }
+    //     if (!options.category.includes(event.category)) {
+    //         options.category.push(event.category);
+    //     }
+    // });
 
     const handleSearchInputChange = (event) => {
         setSearchQuery(event.target.value);
@@ -89,7 +88,7 @@ const Events = () => {
             );
         setFilteredEventsData(filteredData);
     };
-    collectDistinctOptions(events); // this collect organizers and categories from the event data
+    // collectDistinctOptions(events); // this collect organizers and categories from the event data
     useEffect(() => {
         filterData();
     }, [searchQuery, organizer, category, eventtype]);
@@ -124,7 +123,12 @@ const Events = () => {
                     <FormControl sx={{ m: 1, maxWidth: 120, marginLeft: { sm: 0 } }}>
                         <Select id="organizer-option" value={organizer} onChange={(event) => handleOptionChange(event, setOrganizer)}>
                             <MenuItem value={'all'}>Organizer</MenuItem>
-                            {options.organizers.map((organizer) => (
+                            {/* {options.organizers.map((organizer) => (
+                                <MenuItem key={organizer} value={organizer}>
+                                    {organizer}
+                                </MenuItem>
+                            ))} */}
+                            {Array.from(new Set(filteredEventsData.map((event) => event.event_organizer))).map((organizer) => (
                                 <MenuItem key={organizer} value={organizer}>
                                     {organizer}
                                 </MenuItem>
@@ -136,7 +140,12 @@ const Events = () => {
                     <FormControl sx={{ m: 1, maxWidth: 120 }}>
                         <Select id="organizer-option" value={category} onChange={(event) => handleOptionChange(event, setCategory)}>
                             <MenuItem value={'all'}>Category</MenuItem>
-                            {options.category.map((category) => (
+                            {/* {options.category.map((category) => (
+                                <MenuItem key={category} value={category}>
+                                    {category}
+                                </MenuItem>
+                            ))} */}
+                            {Array.from(new Set(filteredEventsData.map((event) => event.category))).map((category) => (
                                 <MenuItem key={category} value={category}>
                                     {category}
                                 </MenuItem>
@@ -148,7 +157,12 @@ const Events = () => {
                     <FormControl sx={{ m: 1, maxWidth: 120 }}>
                         <Select id="organizer-option" value={eventtype} onChange={(event) => handleOptionChange(event, setEventType)}>
                             <MenuItem value={'all'}>Event Type</MenuItem>
-                            {options.eventtypes.map((eventtype) => (
+                            {/* {options.eventtypes.map((eventtype) => (
+                                <MenuItem key={eventtype} value={eventtype}>
+                                    {eventtype}
+                                </MenuItem>
+                            ))} */}
+                            {Array.from(new Set(filteredEventsData.map((event) => event.event_type))).map((eventtype) => (
                                 <MenuItem key={eventtype} value={eventtype}>
                                     {eventtype}
                                 </MenuItem>
