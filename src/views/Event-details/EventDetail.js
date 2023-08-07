@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardMedia, Divider, Grid, Tabs, Tab, Typography, useTheme } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import React from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { useState, useRef, useEffect } from 'react';
 import ReadMore from './ReadMore';
 
@@ -12,13 +12,16 @@ import './eventStyle.css'; // styling to overriede mui
 //dummy datas
 import Events from 'data/events';
 import Organizers from 'data/organizers';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 
 const EventDetail = () => {
     const theme = useTheme();
     const navigate = useNavigate();
-    const [tabValue, setTabValue] = useState('');
+    const [tabValue, setTabValue] = useState('map');
+    const { state } = useLocation();
 
-    const event = Events[0]; // event fetched from the dummy data object
+    const event = Events[0]; // event fetched from the dummy data object assgign this value to state once the api is integrated
+
     const organizer = Organizers.find((organizer) => organizer.organizer_name === event.event_organizer);
 
     const defaultProps = {
@@ -106,7 +109,7 @@ const EventDetail = () => {
                         <Grid item mt={1.5} gap={1.5} display={'flex'} alignItems={'center'}>
                             <Typography variant="h3">{event.event_name}</Typography>
                             <Divider sx={{ height: 10, bgcolor: 'B6B6B6' }} orientation="vertical" />
-                            <Typography variant="h3">5.0</Typography>
+                            <Typography variant="h3">{organizer.rate}</Typography>
                             <StarIcon sx={{ width: '12px', height: '12px', color: '#FFBB00' }} />
                         </Grid>
                         <Grid item>
@@ -217,41 +220,45 @@ const EventDetail = () => {
                 </Grid>
                 <Grid container sx={{ width: '100%' }}>
                     <Card sx={{ width: '100%' }}>
-                        <Box sx={{ width: '100%' }}>
-                            <Tabs
-                                variant="fullWidth"
-                                sx={{ height: '50px', display: 'flex', alignItems: 'center', bgcolor: '#FFF9E8' }}
-                                value={tabValue}
-                                className="custom-tabs"
-                                indicatorColor="white"
-                                onChange={handleTabChange}
-                            >
-                                <Tab value="map" label="Map" />
-                                <Tab value="happening" label="Tickets" />
-                                <Tab value="speakers" label="Speakers" />
-                                <Tab value="schedule" label="Schedule" />
-                                <Tab value="sponsor" label="Sponsor" />
-                                <Tab value="attendees" label="Attendees" />
-                            </Tabs>
+                        <Box sx={{ width: '100%', typography: 'body1' }}>
+                            <TabContext value={tabValue}>
+                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                    <TabList onChange={handleTabChange} sx={{ width: '100%', bgcolor: '#FFF9E8' }} className="custom-tabs">
+                                        <Tab sx={{ flex: 1 }} value="map" label="Map" />
+                                        <Tab sx={{ flex: 1 }} value="tickets" label="Tickets" />
+                                        <Tab sx={{ flex: 1 }} value="speakers" label="Speakers" />
+                                        <Tab sx={{ flex: 1 }} value="schedule" label="Schedule" />
+                                        <Tab sx={{ flex: 1 }} value="sponsor" label="Sponsor" />
+                                        <Tab sx={{ flex: 1 }} value="attendees" label="Attendees" />
+                                    </TabList>
+                                </Box>
+                                <TabPanel value="map">
+                                    <Grid padding={3}>
+                                        <Grid item display={'flex'} gap={3}>
+                                            <Box sx={{ width: '30px', height: '30px', bgcolor: '#F3F3F3', borderRadius: '15px' }}></Box>
+                                            <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                <Typography fontSize={theme.typography.h4}>{event.event_address}</Typography>
+                                                <Typography fontSize={theme.typography.caption}>Event Address</Typography>
+                                            </Grid>
+                                        </Grid>
+                                        <Box style={{ height: '40vh', width: '100%', borderRadius: '12px' }} mt={2}>
+                                            <GoogleMapReact
+                                                bootstrapURLKeys={{ key: '' }}
+                                                defaultCenter={defaultProps.center}
+                                                defaultZoom={defaultProps.zoom}
+                                            >
+                                                <Card lat={event.address_latitude} lng={event.address_longitude} text="Here"></Card>
+                                            </GoogleMapReact>
+                                        </Box>
+                                    </Grid>
+                                </TabPanel>
+                                <TabPanel value="tickets"> tickets is currently in development and will be available soon. </TabPanel>
+                                <TabPanel value="speakers">speakers is currently in development and will be available soon. </TabPanel>
+                                <TabPanel value="schedule">schedule is currently in development and will be available soon. </TabPanel>
+                                <TabPanel value="sponsor">sponsor is currently in development and will be available soon. </TabPanel>
+                                <TabPanel value="attendees">attendees is currently in development and will be available soon. </TabPanel>
+                            </TabContext>
                         </Box>
-                        <Grid padding={3}>
-                            <Grid item display={'flex'} gap={3}>
-                                <Box sx={{ width: '30px', height: '30px', bgcolor: '#F3F3F3', borderRadius: '15px' }}></Box>
-                                <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
-                                    <Typography fontSize={theme.typography.h4}>{event.event_address}</Typography>
-                                    <Typography fontSize={theme.typography.caption}>Event Address</Typography>
-                                </Grid>
-                            </Grid>
-                            <Box style={{ height: '40vh', width: '100%', borderRadius: '12px' }} mt={2}>
-                                <GoogleMapReact
-                                    bootstrapURLKeys={{ key: '' }}
-                                    defaultCenter={defaultProps.center}
-                                    defaultZoom={defaultProps.zoom}
-                                >
-                                    <Card lat={event.address_latitude} lng={event.address_longitude} text="Here"></Card>
-                                </GoogleMapReact>
-                            </Box>
-                        </Grid>
                     </Card>
                 </Grid>
             </Grid>

@@ -28,14 +28,6 @@ const dashboard = {
             breadcrumbs: false
         },
         {
-            id: 'event-detail',
-            title: 'Event Detail',
-            type: 'item',
-            url: '/event-detail',
-            icon: icons.IconBuildingStore,
-            breadcrumbs: false
-        },
-        {
             id: 'tickets',
             title: 'Tickets',
             type: 'item',
