@@ -35,11 +35,13 @@ import LeftEventPanel from './LeftEventPanel';
 import myEvents from 'data/myEvents'; // dummy data for panel 2
 // i assumed that events for both panels are different
 import RightEventPanel from './RightEventPanel';
+import { useNavigate } from 'react-router';
 
 // ==============================|| SAMPLE PAGE ||============================== //
 
 const Events = () => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const [organizer, setOrganizer] = useState('all'); // for filter options
     const [category, setCategory] = useState('all'); // for filter options
     const [eventtype, setEventType] = useState('all'); //for filter options
@@ -97,7 +99,7 @@ const Events = () => {
         <Grid container display={'flex'} flexDirection={'column'}>
             <Grid item m={1} display={'flex'} justifyContent="space-between">
                 <Typography variant="h2">Events</Typography>
-                <Button variant="contained" startIcon={<AddIcon />}>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/add-event')}>
                     Add Events
                 </Button>
             </Grid>

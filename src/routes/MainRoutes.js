@@ -18,6 +18,8 @@ const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const Events = Loadable(lazy(() => import('views/events')));
 const EventDetail = Loadable(lazy(() => import('views/Event-details/EventDetail')));
+const AddEvent = Loadable(lazy(() => import('views/add-event')));
+const UpdateEvent = Loadable(lazy(() => import('views/update-event')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -94,6 +96,14 @@ const MainRoutes = {
         {
             path: 'event-detail',
             element: <EventDetail />
+        },
+        {
+            path: 'add-event',
+            element: <AddEvent />
+        },
+        {
+            path: 'update-event',
+            element: <UpdateEvent />
         }
     ]
 };

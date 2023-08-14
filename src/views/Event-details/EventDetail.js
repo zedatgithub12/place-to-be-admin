@@ -206,7 +206,11 @@ const EventDetail = () => {
                             </Grid>
                         </Card>
                         <Grid item mt={2}>
-                            <Button variant="outlined" sx={{ width: '103px' }}>
+                            <Button
+                                variant="outlined"
+                                sx={{ width: '103px' }}
+                                onClick={() => navigate('/update-event', { state: { ...event } })}
+                            >
                                 Edit
                             </Button>
                             <Button variant="text" sx={{ color: '#383838' }}>
