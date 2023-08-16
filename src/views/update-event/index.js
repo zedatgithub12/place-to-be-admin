@@ -29,7 +29,7 @@ import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import dayjs from 'dayjs';
-import events from '../../data/myEvents'; //dummy data
+import events from '../../data/events'; //dummy data
 
 // ==============================|| Add Events PAGE ||============================== //
 
@@ -42,27 +42,27 @@ const UpdateEvent = () => {
     const fileInputRef = useRef(null);
 
     const [formData, setFormData] = useState({
-        title: event.title,
-        description: event.description,
-        startDate: event.startDate,
-        endDate: event.endDate,
-        startTime: event.startTime,
-        endTime: event.endTime,
-        eventAddress: event.eventAddress,
-        eventType: event.eventType,
-        eventCategory: event.eventCategory,
-        regularPrice: event.regularPrice,
-        phones: event.phones,
-        linkUrl: event.linkUrl,
-        poster: event.poster,
-        buttonLabel: event.buttonLabel
+        title: event.event_name,
+        description: event.event_description,
+        startDate: event.start_date,
+        endDate: event.end_date,
+        startTime: event.start_time,
+        endTime: event.end_time,
+        eventAddress: event.event_address,
+        eventType: event.event_type,
+        eventCategory: event.category,
+        regularPrice: event.event_entrance_fee,
+        phones: [event.contact_phone, event.contact_phone_2],
+        linkUrl: event.redirectUrl,
+        poster: event.event_image,
+        buttonLabel: event.link_label
     });
 
     const [forAdapterJS, setForAdapterJS] = useState({
-        startDate: dayjs(event.startDate),
-        endDate: dayjs(event.endDate),
-        startTime: dayjs(event.startTime),
-        endTime: dayjs(event.endTime)
+        startDate: dayjs(event.start_date),
+        endDate: dayjs(event.end_date),
+        startTime: dayjs(event.start_time),
+        endTime: dayjs(event.end_time)
     });
 
     const [posterPreview, setPosterPreview] = useState(formData.poster);

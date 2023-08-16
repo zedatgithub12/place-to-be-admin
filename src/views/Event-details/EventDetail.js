@@ -20,7 +20,7 @@ const EventDetail = () => {
     const [tabValue, setTabValue] = useState('map');
     const { state } = useLocation();
 
-    const event = Events[0]; // event fetched from the dummy data object assgign this value to state once the api is integrated
+    const event = Events[1]; // event fetched from the dummy data object assgign this value to state once the api is integrated
 
     const organizer = Organizers.find((organizer) => organizer.organizer_name === event.event_organizer);
 
@@ -109,7 +109,7 @@ const EventDetail = () => {
                         <Grid item mt={1.5} gap={1.5} display={'flex'} alignItems={'center'}>
                             <Typography variant="h3">{event.event_name}</Typography>
                             <Divider sx={{ height: 10, bgcolor: 'B6B6B6' }} orientation="vertical" />
-                            <Typography variant="h3">{organizer.rate}</Typography>
+                            <Typography variant="h3">{event.rating}</Typography>
                             <StarIcon sx={{ width: '12px', height: '12px', color: '#FFBB00' }} />
                         </Grid>
                         <Grid item>
@@ -201,7 +201,7 @@ const EventDetail = () => {
                                 </Grid>
                             </Grid>
                             <Grid display={'flex'}>
-                                <Typography variant="h3">{organizer.rate}</Typography>
+                                <Typography variant="h3">{organizer.rating}</Typography>
                                 <StarIcon sx={{ width: '12px', height: '12px', color: '#FFBB00', marginTop: 0.5 }} />
                             </Grid>
                         </Card>

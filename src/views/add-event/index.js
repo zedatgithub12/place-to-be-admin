@@ -162,9 +162,30 @@ const AddEvent = () => {
         setActiveAccordion((prev) => prev + 1);
     };
 
+    const transformFormData = (formData) => {
+        // a function to correspond the name used in the code with the once goes to the server for consistency
+        return {
+            event_image: formData.poster,
+            event_name: formData.title,
+            event_description: formData.description,
+            start_date: formData.startDate,
+            start_time: formData.startTime,
+            end_date: formData.endDate,
+            end_time: formData.endTime,
+            category: formData.eventCategory,
+            event_address: formData.eventAddress,
+            contact_phone: formData.phones[0],
+            contact_phone_2: formData.phones[1],
+            link_label: formData.buttonLabel,
+            redirectUrl: formData.linkUrl,
+            event_type: formData.eventType,
+            event_entrance_fee: formData.regularPrice
+        };
+    };
     const handleOnSubmit = (e) => {
         e.preventDefault();
-        console.log(formData);
+
+        console.log(transformFormData(formData));
     };
 
     const handleAccordionChange = (panel) => (event, isExpanded) => {
