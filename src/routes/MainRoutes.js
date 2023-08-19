@@ -3,6 +3,7 @@ import { lazy } from 'react';
 // project imports
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
+import Tickets from 'views/tickets';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -20,6 +21,7 @@ const Events = Loadable(lazy(() => import('views/events')));
 const EventDetail = Loadable(lazy(() => import('views/Event-details/EventDetail')));
 const AddEvent = Loadable(lazy(() => import('views/add-event')));
 const UpdateEvent = Loadable(lazy(() => import('views/update-event')));
+const CustomerSupport = Loadable(lazy(() => import('views/customer-support')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -104,6 +106,14 @@ const MainRoutes = {
         {
             path: 'update-event',
             element: <UpdateEvent />
+        },
+        {
+            path: 'customer-support',
+            element: <CustomerSupport />
+        },
+        {
+            path: 'tickets',
+            element: <Tickets />
         }
     ]
 };
