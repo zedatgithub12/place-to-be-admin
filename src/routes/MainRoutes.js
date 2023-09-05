@@ -14,8 +14,6 @@ const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
 const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 const UtilsMaterialIcons = Loadable(lazy(() => import('views/utilities/MaterialIcons')));
 const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons')));
-const Audience = Loadable(lazy(() => import('views/audience/index')));
-const ChangePassword = Loadable(lazy(() => import('views/audience/changePassword')));
 
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
@@ -88,14 +86,6 @@ const MainRoutes = {
                     element: <UtilsMaterialIcons />
                 }
             ]
-        },
-        {
-            path: 'audience',
-            element: <Audience />
-        },
-        {
-            path: 'change-password',
-            element: <ChangePassword />
         },
         {
             path: 'sample-page',
