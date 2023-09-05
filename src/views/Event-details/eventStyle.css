@@ -1,0 +1,9 @@
+.custom-tabs .MuiTabs-indicator {
+    background-color: #fff9e8;
+    border-radius: 10px !important;
+}
+
+.custom-tabs .Mui-selected {
+    background-color: #ffbb00;
+    color: black;
+}
