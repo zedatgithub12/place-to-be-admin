@@ -6,9 +6,9 @@ import { useTheme } from '@mui/material/styles';
 import {
     Box,
     Button,
-    Checkbox,
+    // Checkbox,
     FormControl,
-    FormControlLabel,
+    // FormControlLabel,
     FormHelperText,
     Grid,
     IconButton,
@@ -32,7 +32,8 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { AuthContext } from 'context/context';
-import Connections from 'api/connections';
+import Connections from 'api';
+import { useNavigate } from 'react-router-dom';
 
 // import Google from 'assets/images/icons/social-google.svg';
 
@@ -43,12 +44,14 @@ const FirebaseLogin = ({ ...others }) => {
     const Sign = (status, user) => {
         SignIn(status, user);
     };
+    const navigate = useNavigate();
+
     const theme = useTheme();
     const scriptedRef = useScriptRef();
     // const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     // const customization = useSelector((state) => state.customization);
-    const [checked, setChecked] = useState(true);
 
+    const [logSpinner, setLogSpinner] = useState(false);
     // const googleHandler = async () => {
     //     console.error('Login');
     // };
@@ -147,43 +150,40 @@ const FirebaseLogin = ({ ...others }) => {
                             setSubmitting(false);
                         }
                     }
-                    var Api = Connections.url + Connections.login;
+                    setLogSpinner(true);
+
+                    const email = values.email;
+                    const password = values.password;
+
+                    var Api = Connections.api + Connections.adminsignin + `?email=${email}&password=${password}`;
                     var headers = {
                         accept: 'application/json',
                         'Content-Type': 'application/json'
                     };
 
-                    var data = {
-                        email: values.email,
-                        password: values.password
-                    };
-
                     fetch(Api, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(data)
+                        method: 'GET',
+                        headers: headers
                     })
                         .then((response) => response.json())
                         .then((response) => {
-                            if (!(response == '83')) {
+                            if (response.success) {
                                 setStatus({ success: true });
                                 setSubmitting(false);
-                                Sign('Signed', response);
-                            } else if (response.status == '83') {
-                                setStatus({ success: false });
-                                setErrors({ submit: err.message });
-                                setSubmitting(false);
+                                Sign('Signed', response.user);
+                                setLogSpinner(false);
                             } else {
                                 setStatus({ success: false });
-                                setErrors({ submit: err.message });
+                                setErrors({ submit: response.message });
                                 setSubmitting(false);
+                                setLogSpinner(false);
                             }
                         })
                         .catch((err) => {
-                            console.log(err);
                             setStatus({ success: false });
                             setErrors({ submit: err.message });
                             setSubmitting(false);
+                            setLogSpinner(false);
                         });
                 }}
             >
@@ -243,7 +243,7 @@ const FirebaseLogin = ({ ...others }) => {
                                 </FormHelperText>
                             )}
                         </FormControl>
-                        <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={1}>
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                             {/* <FormControlLabel
                                 control={
                                     <Checkbox
@@ -255,7 +255,12 @@ const FirebaseLogin = ({ ...others }) => {
                                 }
                                 label="Remember me"
                             /> */}
-                            <Typography variant="subtitle1" color="primary" sx={{ textDecoration: 'none', cursor: 'pointer' }}>
+                            <Typography
+                                variant="subtitle1"
+                                color="dark"
+                                sx={{ textDecoration: 'none', cursor: 'pointer' }}
+                                onClick={() => navigate('/password')}
+                            >
                                 Forgot Password?
                             </Typography>
                         </Stack>
@@ -275,9 +280,14 @@ const FirebaseLogin = ({ ...others }) => {
                                     type="submit"
                                     variant="contained"
                                     color="warning"
-                                    sx={{ backgroundColor: theme.palette.warning.dark, color: theme.palette.grey[900] }}
                                 >
-                                    Sign in
+                                    {logSpinner ? (
+                                        <div className="spinner-border spinner-border-sm text-light " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Sign in'
+                                    )}
                                 </Button>
                             </AnimateButton>
                         </Box>

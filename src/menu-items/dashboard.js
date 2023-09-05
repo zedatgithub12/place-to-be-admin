@@ -1,14 +1,40 @@
 // assets
-import { IconDashboard, IconBrandChrome, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers } from '@tabler/icons';
+import {
+    IconDashboard,
+    IconBrandChrome,
+    IconBox,
+    IconCategory,
+    IconBuildingStore,
+    IconTimeline,
+    IconCalendarEvent,
+    IconTicket,
+    IconUsers,
+    IconSpeakerphone,
+    IconHeadset,
+    IconNotification
+} from '@tabler/icons';
 
 // constant
-const icons = { IconDashboard, IconBrandChrome, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers };
+const icons = {
+    IconDashboard,
+    IconCalendarEvent,
+    IconTicket,
+    IconBrandChrome,
+    IconBox,
+    IconCategory,
+    IconBuildingStore,
+    IconTimeline,
+    IconUsers,
+    IconSpeakerphone,
+    IconHeadset,
+    IconNotification
+};
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
 const dashboard = {
     id: 'dashboard',
-    title: 'Dashboard',
+    title: '',
     type: 'group',
     children: [
         {
@@ -24,7 +50,7 @@ const dashboard = {
             title: 'Events',
             type: 'item',
             url: '/events',
-            icon: icons.IconBuildingStore,
+            icon: icons.IconCalendarEvent,
             breadcrumbs: false
         },
         {
@@ -32,23 +58,32 @@ const dashboard = {
             title: 'Tickets',
             type: 'item',
             url: '/tickets',
-            icon: icons.IconBox,
+            icon: icons.IconTicket,
             breadcrumbs: false
         },
-        {
-            id: 'users',
-            title: 'Users',
-            type: 'item',
-            url: '/sample-page',
-            icon: icons.IconCategory,
-            breadcrumbs: false
-        },
+
         {
             id: 'ads',
             title: 'Ads Management',
             type: 'item',
             url: '/sample-page',
-            icon: icons.IconTimeline,
+            icon: icons.IconSpeakerphone,
+            breadcrumbs: false
+        },
+        {
+            id: 'notification',
+            title: 'Notifications',
+            type: 'item',
+            url: '/sample-page',
+            icon: icons.IconNotification,
+            breadcrumbs: false
+        },
+        {
+            id: 'users',
+            title: 'User',
+            type: 'item',
+            url: '/sample-page',
+            icon: icons.IconUsers,
             breadcrumbs: false
         },
         {
@@ -56,7 +91,7 @@ const dashboard = {
             title: 'Customer Support',
             type: 'item',
             url: '/customer-support',
-            icon: icons.IconUsers,
+            icon: icons.IconHeadset,
             breadcrumbs: false
         }
     ]
