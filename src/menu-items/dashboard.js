@@ -23,7 +23,7 @@ const dashboard = {
             id: 'events',
             title: 'Events',
             type: 'item',
-            url: '/sample-page',
+            url: '/events',
             icon: icons.IconBuildingStore,
             breadcrumbs: false
         },
@@ -31,7 +31,7 @@ const dashboard = {
             id: 'tickets',
             title: 'Tickets',
             type: 'item',
-            url: '/sample-page',
+            url: '/tickets',
             icon: icons.IconBox,
             breadcrumbs: false
         },
@@ -55,7 +55,7 @@ const dashboard = {
             id: 'customersupport',
             title: 'Customer Support',
             type: 'item',
-            url: '/sample-page',
+            url: '/customer-support',
             icon: icons.IconUsers,
             breadcrumbs: false
         }

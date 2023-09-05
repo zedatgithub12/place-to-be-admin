@@ -1,0 +1,25 @@
+.custom-tabs .MuiTabs-indicator {
+    background-color: white;
+    border-radius: 10px !important;
+}
+
+.custom-tabs .Mui-selected {
+    background-color: #ffbb00;
+    color: black;
+    border-radius: 10px !important;
+}
+
+.custom-tabs .Mui-selected > .counter {
+    background-color: red;
+    color: white;
+}
+
+.custom-select > div {
+    background-color: #0065db;
+}
+
+.custom-select > svg {
+    background-color: white;
+    margin: 0;
+    padding: '5px 0px 5px 5px';
+}
