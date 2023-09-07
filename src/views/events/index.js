@@ -13,67 +13,46 @@ import {
     Box,
     Button
 } from '@mui/material';
-import {
-    Table,
-    TableBody,
-    TableHead,
-    TableCell,
-    TableContainer,
-    TableRow,
-    TablePagination,
-    NativeSelect,
-    TableFooter
-} from '@mui/material';
+
 import AddIcon from '@mui/icons-material/Add';
-import { Search, ArrowForward, MoreVert } from '@mui/icons-material';
-import { useState, useMemo, useEffect } from 'react';
+import { Search } from '@mui/icons-material';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import events from 'data/events';
 import LeftEventPanel from './LeftEventPanel';
 import myEvents from 'data/myEvents'; // dummy data for panel 2
-// i assumed that events for both panels are different
 import RightEventPanel from './RightEventPanel';
 import { useNavigate } from 'react-router';
+import Connections from 'api';
 
 // ==============================|| SAMPLE PAGE ||============================== //
 
 const Events = () => {
     const theme = useTheme();
     const navigate = useNavigate();
+
     const [organizer, setOrganizer] = useState('all'); // for filter options
     const [category, setCategory] = useState('all'); // for filter options
     const [eventtype, setEventType] = useState('all'); //for filter options
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredEventsData, setFilteredEventsData] = useState(events);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filteredEventsData, setFilteredEventsData] = useState([]);
     const options = {
         organizers: [],
         eventtypes: ['free', 'paid'],
         category: []
     };
-
-    // const collectDistinctOptions = (events) => {
-    // events.forEach((event) => {
-    //     if (!options.organizers.includes(event.event_organizer)) {
-    //         options.organizers.push(event.event_organizer);
-    //     }
-    //     if (!options.category.includes(event.category)) {
-    //         options.category.push(event.category);
-    //     }
-    // });
-
     const handleSearchInputChange = (event) => {
         setSearchQuery(event.target.value);
     };
-
-    // Function to handle search button click and apply filters
     const handleSearchButtonClick = () => {
         filterData();
     };
 
-    // Function to handle filter option changes and apply filters
     const handleOptionChange = (event, stateUpdater) => {
         stateUpdater(event.target.value);
         filterData();
@@ -90,10 +69,34 @@ const Events = () => {
             );
         setFilteredEventsData(filteredData);
     };
-    // collectDistinctOptions(events); // this collect organizers and categories from the event data
+
+    const GetEvents = () => {
+        var Api = Connections.api + Connections.events;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        fetch(Api, {
+            method: 'get',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setFilteredEventsData(response.data);
+                    setLoading(false);
+                }
+            })
+            .catch((error) => {
+                setLoading(false);
+            });
+    };
+
     useEffect(() => {
-        filterData();
-    }, [searchQuery, organizer, category, eventtype]);
+        GetEvents();
+        return () => {};
+    }, []);
 
     return (
         <Grid container display={'flex'} flexDirection={'column'}>
@@ -120,16 +123,12 @@ const Events = () => {
                         </IconButton>
                     </Paper>
                 </Grid>
-                {/* organizer option */}
+
                 <Grid item xs={12} sm={12} md={6} lg={4} sx={{ marginLeft: { lg: 1 } }} display={'flex'}>
                     <FormControl sx={{ m: 1, maxWidth: 120, marginLeft: { sm: 0 } }}>
                         <Select id="organizer-option" value={organizer} onChange={(event) => handleOptionChange(event, setOrganizer)}>
                             <MenuItem value={'all'}>Organizer</MenuItem>
-                            {/* {options.organizers.map((organizer) => (
-                                <MenuItem key={organizer} value={organizer}>
-                                    {organizer}
-                                </MenuItem>
-                            ))} */}
+
                             {Array.from(new Set(filteredEventsData.map((event) => event.event_organizer))).map((organizer) => (
                                 <MenuItem key={organizer} value={organizer}>
                                     {organizer}
@@ -138,15 +137,10 @@ const Events = () => {
                         </Select>
                     </FormControl>
 
-                    {/* category option */}
                     <FormControl sx={{ m: 1, maxWidth: 120 }}>
                         <Select id="organizer-option" value={category} onChange={(event) => handleOptionChange(event, setCategory)}>
                             <MenuItem value={'all'}>Category</MenuItem>
-                            {/* {options.category.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))} */}
+
                             {Array.from(new Set(filteredEventsData.map((event) => event.category))).map((category) => (
                                 <MenuItem key={category} value={category}>
                                     {category}
@@ -155,15 +149,9 @@ const Events = () => {
                         </Select>
                     </FormControl>
 
-                    {/* event-type option */}
                     <FormControl sx={{ m: 1, maxWidth: 120 }}>
                         <Select id="organizer-option" value={eventtype} onChange={(event) => handleOptionChange(event, setEventType)}>
                             <MenuItem value={'all'}>Event Type</MenuItem>
-                            {/* {options.eventtypes.map((eventtype) => (
-                                <MenuItem key={eventtype} value={eventtype}>
-                                    {eventtype}
-                                </MenuItem>
-                            ))} */}
                             {Array.from(new Set(filteredEventsData.map((event) => event.event_type))).map((eventtype) => (
                                 <MenuItem key={eventtype} value={eventtype}>
                                     {eventtype}
@@ -175,10 +163,10 @@ const Events = () => {
             </Grid>
             <Grid container sx={{ display: 'flex' }}>
                 <Grid item sx={{ flex: 5, marginRight: { lg: 3, xl: 3 }, marginBottom: { xs: 1, sm: 1 } }}>
-                    <LeftEventPanel events={filteredEventsData} />
+                    <LeftEventPanel events={filteredEventsData} isLoading={loading} />
                 </Grid>
                 <Grid item sx={{ flex: 3, display: 'flex', flexDirection: 'column' }}>
-                    <RightEventPanel events={events} />
+                    <RightEventPanel events={filteredEventsData} />
                 </Grid>
             </Grid>
         </Grid>

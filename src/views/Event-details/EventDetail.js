@@ -1,28 +1,120 @@
-import { Box, Button, Card, CardMedia, Divider, Grid, Tabs, Tab, Typography, useTheme } from '@mui/material';
-import StarIcon from '@mui/icons-material/Star';
-import React from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { useState, useRef, useEffect } from 'react';
+import {
+    Box,
+    Button,
+    Card,
+    CardMedia,
+    Divider,
+    Grid,
+    Tab,
+    Typography,
+    useTheme,
+    Avatar,
+    IconButton,
+    Menu,
+    MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    CircularProgress
+} from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import StarIcon from '@mui/icons-material/Star';
 import ReadMore from './ReadMore';
+import Connections from 'api';
+import GoogleMapReact from 'google-map-react';
 
-import GoogleMapReact from 'google-map-react'; // google map api library
-
-import './eventStyle.css'; // styling to overriede mui
-
-//dummy datas
-import Events from 'data/events';
-import Organizers from 'data/organizers';
+import { MoreVert } from '@mui/icons-material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
+import {
+    IconCalendarMinus,
+    IconCalendarTime,
+    IconCategory,
+    IconCheck,
+    IconCircleDashed,
+    IconCoins,
+    IconLink,
+    IconMapPin,
+    IconPhone,
+    IconTags
+} from '@tabler/icons';
+import { DateFormater, EventStatus, TimeFormater } from 'utils/functions';
+import { EventStatuses } from 'data/eventStatus';
+import './eventStyle.css'; // styling to overriede mui
+import pin from 'assets/icons/marker.svg';
+
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const Marker = () => (
+    <div className="marker">
+        <img src={pin} alt="marker" width={30} height={30} />
+    </div>
+);
 
 const EventDetail = () => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const GoBack = () => {
+        navigate(-1);
+    };
     const [tabValue, setTabValue] = useState('map');
     const { state } = useLocation();
 
-    const event = Events[1]; // event fetched from the dummy data object assgign this value to state once the api is integrated
+    const [event, setEvent] = useState(state);
+    const [statusOfEvent, setStatusOfEvent] = useState(state.event_status);
+    const [coords, setCoords] = useState(true);
+    const [organizer, setOrganizer] = useState([]);
+    const [rating, setRating] = useState();
+    const [numberOfRatings, setNumberOfRatings] = useState();
+    const [loading, setLoading] = useState(true);
+    const [fetchingFailed, setFetchingFailed] = useState(false);
+    const [currentRating, setCurrentRating] = useState(0);
+    const [ratingDetails, setRatingDetails] = useState([]);
+    const [userRated, setUserRated] = useState(false);
+    const [spinner, setSpinner] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
-    const organizer = Organizers.find((organizer) => organizer.organizer_name === event.event_organizer);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
+
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleSelectItem = (events) => {
+        handleMenuClick(events);
+    };
+
+    const handleDialogOpen = () => {
+        setDialogOpen(true);
+    };
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+    };
+    var featuredImageUri = Connections.api + Connections.assets;
 
     const defaultProps = {
         //for the goggle map component
@@ -32,32 +124,13 @@ const EventDetail = () => {
         },
         zoom: 11
     };
+    const checkCoords = (latlng) => {
+        var latitude = latlng.address_latitude;
+        var longitude = latlng.address_latitude;
 
-    const formatDate = (dateString) => {
-        const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-        const date = new Date(dateString);
-        const day = weekdays[date.getDay()];
-        const month = months[date.getMonth()];
-        const formattedDate = `${day} ${month} ${date.getDate().toString().padStart(2, '0')}`;
-
-        return formattedDate;
-    };
-
-    const formatTime = (time24) => {
-        const [hours, minutes] = time24.split(':');
-        let period = 'AM';
-        let hours12 = parseInt(hours, 10);
-
-        if (hours12 >= 12) {
-            period = 'PM';
-            if (hours12 > 12) {
-                hours12 -= 12;
-            }
+        if (latitude == null && longitude == null) {
+            setCoords(false);
         }
-
-        return `${hours12}:${minutes} ${period}`;
     };
 
     const handleTabChange = (event, newValue) => {
@@ -77,6 +150,188 @@ const EventDetail = () => {
             return 'Upcoming';
         }
     };
+
+    const FeatchEvent = () => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+
+        setLoading(true);
+
+        var ApiUrl = Connections.api + Connections.eventDetail + state.id;
+
+        var headers = {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        fetch(ApiUrl, {
+            method: 'GET',
+            headers: headers,
+            signal: signal
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    let event = response.data;
+                    let ticket = response.tickets;
+                    let organizer = response.organizer;
+                    let rating = response.rating;
+                    let numberOfRatings = response.numberOfRatings;
+
+                    let startTime = response.StartTime;
+                    let EndTime = response.EndTime;
+                    setEvent(event);
+                    setOrganizer(organizer);
+                    setRating(rating);
+                    setNumberOfRatings(numberOfRatings);
+                    setLoading(false);
+                    checkCoords(event);
+                } else {
+                    setLoading(false);
+                    setFetchingFailed(true);
+                }
+            })
+            .catch((error) => {
+                setLoading(false);
+                setFetchingFailed(true);
+            });
+
+        return () => {
+            controller.abort();
+        };
+    };
+
+    const FetchUserRating = async () => {
+        if (state.userId) {
+            const controller = new AbortController();
+            const signal = controller.signal;
+            var ApiUrl = Connections.api + Connections.moreEventDetails + `?eventid=${state.id}&userid=${state.userId}`;
+            // header type for text data to be send to server
+            var headers = {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            fetch(ApiUrl, {
+                method: 'GET',
+                headers: headers,
+                signal: signal
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setRatingDetails(response.userrating);
+                        setCurrentRating(response.userrating.rating);
+                        setUserRated(response.userrating.rating ? true : false);
+                    }
+                })
+                .catch((error) => {
+                    setLoading(false);
+                });
+
+            return () => {
+                controller.abort();
+            };
+        }
+    };
+
+    const handleStatusChange = (status, id) => {
+        var Api = Connections.api + Connections.changeEventStatus + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        const data = {
+            event_status: status
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify(data),
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setAnchorEl(null);
+                    setStatusOfEvent(status);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error updating stock status!'
+                });
+            });
+    };
+
+    const Delete = () => {
+        setSpinner(true);
+        var Api = Connections.api + Connections.deleteEvent + event.id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'DELETE',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+
+                    setSpinner(false);
+                    handleDialogClose();
+                    GoBack();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error deleting this event!'
+                });
+                setSpinner(false);
+            });
+    };
+    useEffect(() => {
+        FeatchEvent();
+        FetchUserRating();
+
+        return () => {};
+    }, [state.id]);
     return (
         <Grid container>
             <Grid
@@ -87,43 +342,68 @@ const EventDetail = () => {
                 lg={12}
                 xl={12}
                 m={1}
-                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingX: 2.4 }}
             >
-                <Typography variant="h2">Event Detail</Typography>
-                <Button
-                    variant="contained"
-                    size="small"
-                    sx={{ width: '100px', bgcolor: '#D1E9FF', color: '#0065DB', '&:hover': { color: 'white' } }}
-                    onClick={() => navigate('/events')}
-                >
+                <Typography variant="h2">
+                    {event.event_name} {event.rating}
+                    <StarIcon sx={{ width: '12px', height: '12px', color: '#FFBB00' }} />{' '}
+                </Typography>
+                <Button variant="text" size="small" sx={{ width: '100px' }} onClick={() => GoBack()}>
                     Back
                 </Button>
             </Grid>
             <Divider sx={{ width: '100%' }} bgcolor="#B6B6B6" />
             <Grid container m={{ md: 1, lg: 3, xl: 3 }} sx={{ width: '100%' }}>
                 <Grid container sx={{ display: 'flex', justifyContent: 'space-between' }} mb={5}>
-                    <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-                        <Card sx={{ width: '100%' }}>
-                            <CardMedia component="img" image={event.event_image} alt="event image"></CardMedia>
+                    <Grid item xs={12} sm={12} md={5.9} lg={5.9} xl={3.8} sx={{ marginBottom: 1 }}>
+                        <Card
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: theme.palette.background.main
+                            }}
+                        >
+                            <CardMedia
+                                component="img"
+                                image={featuredImageUri + event.event_image}
+                                alt="event poster"
+                                sx={{ width: '100%', height: '81%' }}
+                            ></CardMedia>
                         </Card>
-                        <Grid item mt={1.5} gap={1.5} display={'flex'} alignItems={'center'}>
-                            <Typography variant="h3">{event.event_name}</Typography>
-                            <Divider sx={{ height: 10, bgcolor: 'B6B6B6' }} orientation="vertical" />
-                            <Typography variant="h3">{event.rating}</Typography>
-                            <StarIcon sx={{ width: '12px', height: '12px', color: '#FFBB00' }} />
-                        </Grid>
-                        <Grid item>
-                            <ReadMore text={event.event_description} maxLetters={250} />
-                        </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={5.5} xl={5.5}>
+                    <Grid item xs={12} sm={12} md={5.9} lg={5.9} xl={3.8}>
                         <Card sx={{ width: '100%', padding: 3, marginBottom: 1 }}>
-                            <Typography variant="h4">Event Detail</Typography>
-                            <Divider sx={{ width: '100%' }} bgcolor="#B6B6B6" />
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Typography variant="h4">Event Detail</Typography>
+                                <IconButton
+                                    aria-controls="row-menu"
+                                    aria-haspopup="true"
+                                    onClick={(events) => handleSelectItem(events, event)}
+                                >
+                                    <MoreVert />
+                                </IconButton>
+                                <Menu
+                                    id="row-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleMenuClose}
+                                    className="shadow-sm"
+                                >
+                                    {EventStatuses.filter((item) => item.value !== statusOfEvent).map((item) => (
+                                        <MenuItem key={item.id} onClick={() => handleStatusChange(item.value, event.id)}>
+                                            {item.label}
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </Box>
+
+                            <Divider sx={{ marginY: 1 }} />
                             <Grid container display={'flex'} gap={5}>
                                 <Grid item>
-                                    <Typography mt={1}> id</Typography>
-                                    <Typography mt={1}>status</Typography>
+                                    <Typography mt={1}>ID</Typography>
+                                    <Typography mt={1}>Status</Typography>
                                     <Typography mt={1}> Added on</Typography>
                                     <Typography mt={1}>Event Type</Typography>
                                 </Grid>
@@ -131,11 +411,15 @@ const EventDetail = () => {
                                     <Typography mt={1} fontWeight={theme.typography.fontWeightBold}>
                                         {event.id}
                                     </Typography>
-                                    <Typography mt={1} fontWeight={theme.typography.fontWeightBold}>
-                                        {event.event_status}
+                                    <Typography
+                                        mt={1}
+                                        fontWeight={theme.typography.fontWeightBold}
+                                        sx={{ color: EventStatus(statusOfEvent).statusColor }}
+                                    >
+                                        {EventStatus(statusOfEvent).literalStatus}
                                     </Typography>
                                     <Typography mt={1} fontWeight={theme.typography.fontWeightBold}>
-                                        {event.added_date}
+                                        {DateFormater(event.created_at)}
                                     </Typography>
                                     <Typography mt={1} fontWeight={theme.typography.fontWeightBold}>
                                         {event.event_type}
@@ -145,101 +429,191 @@ const EventDetail = () => {
                         </Card>
                         <Card sx={{ width: '100%', padding: 3, marginBottom: 1 }}>
                             <Grid item display={'flex'} gap={4}>
-                                <Box sx={{ width: '30px', height: '30px', bgcolor: '#F3F3F3', borderRadius: '15px' }}></Box>
-                                <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                    <IconCalendarTime />
+                                </Avatar>
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography fontWeight={theme.typography.fontWeightBold}>
-                                        {formatDate(event.start_date)} @ {formatTime(event.start_time)}
+                                        {DateFormater(event.start_date)} @ {TimeFormater(event.start_time)}
                                     </Typography>
                                     <Typography fontSize={theme.typography.caption}>Start Date and Time</Typography>
-                                </Grid>
+                                </Box>
                             </Grid>
                             <Grid item display={'flex'} gap={4} mt={2}>
-                                <Box sx={{ width: '30px', height: '30px', bgcolor: '#F3F3F3', borderRadius: '50%' }}></Box>
-                                <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                    <IconCalendarMinus />
+                                </Avatar>
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography fontWeight={theme.typography.fontWeightBold}>
-                                        {formatDate(event.end_date)} @ {formatTime(event.end_time)}
+                                        {DateFormater(event.end_date)} @ {TimeFormater(event.end_time)}
                                     </Typography>
                                     <Typography fontSize={theme.typography.caption}>End Date and Time</Typography>
-                                </Grid>
+                                </Box>
                             </Grid>
                             <Grid item display={'flex'} gap={4} mt={2}>
-                                <Box sx={{ width: '30px', height: '30px', bgcolor: '#F3F3F3', borderRadius: '50%' }}></Box>
-                                <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                    {getEventStatus(event) === 'Happening' ? <IconCheck /> : <IconCircleDashed />}
+                                </Avatar>
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography fontWeight={theme.typography.fontWeightBold}>{getEventStatus(event)}</Typography>
                                     <Typography fontSize={theme.typography.caption}>Status</Typography>
-                                </Grid>
+                                </Box>
                             </Grid>
                             <Grid item display={'flex'} gap={4} mt={2}>
-                                <Box sx={{ width: '30px', height: '30px', bgcolor: '#F3F3F3', borderRadius: '50%' }}></Box>
-                                <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                    <IconMapPin />
+                                </Avatar>
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography fontWeight={theme.typography.fontWeightBold}>{event.event_address}</Typography>
                                     <Typography fontSize={theme.typography.caption}>Event Address</Typography>
-                                </Grid>
+                                </Box>
                             </Grid>
                             <Grid item display={'flex'} gap={4} mt={2}>
-                                <Box sx={{ width: '30px', height: '30px', bgcolor: '#F3F3F3', borderRadius: '50%' }}></Box>
-                                <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                    <IconCategory />
+                                </Avatar>
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography fontWeight={theme.typography.fontWeightBold}>{event.category}</Typography>
                                     <Typography fontSize={theme.typography.caption}>Category</Typography>
+                                </Box>
+                            </Grid>
+
+                            {event.event_type === 'paid' && (
+                                <Grid item display={'flex'} gap={4} mt={2}>
+                                    <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                        <IconCoins />
+                                    </Avatar>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <Typography fontWeight={theme.typography.fontWeightBold}>{event.event_entrance_fee} ETB</Typography>
+                                        <Typography fontSize={theme.typography.caption}>Regular Ticket Price</Typography>
+                                    </Box>
                                 </Grid>
+                            )}
+
+                            {event.contact_phone && (
+                                <Grid item display={'flex'} gap={4} mt={2}>
+                                    <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                        <IconPhone />
+                                    </Avatar>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <Typography fontWeight={theme.typography.fontWeightBold}>{event.contact_phone} </Typography>
+                                        <Typography fontSize={theme.typography.caption}>Contact phone one</Typography>
+                                    </Box>
+                                </Grid>
+                            )}
+
+                            {event.contact_phone_2 && (
+                                <Grid item display={'flex'} gap={4} mt={2}>
+                                    <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                        <IconPhone />
+                                    </Avatar>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <Typography fontWeight={theme.typography.fontWeightBold}>{event.contact_phone_2} </Typography>
+                                        <Typography fontSize={theme.typography.caption}>Contact phone two</Typography>
+                                    </Box>
+                                </Grid>
+                            )}
+
+                            {event.link_label && (
+                                <Grid item display={'flex'} gap={4} mt={2}>
+                                    <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                        <IconTags />
+                                    </Avatar>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <Typography fontWeight={theme.typography.fontWeightBold}>{event.link_label} </Typography>
+                                        <Typography fontSize={theme.typography.caption}>Link Label</Typography>
+                                    </Box>
+                                </Grid>
+                            )}
+
+                            {event.redirectUrl && (
+                                <Grid item display={'flex'} gap={4} mt={2}>
+                                    <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                        <IconLink />
+                                    </Avatar>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <Typography fontWeight={theme.typography.fontWeightBold}>{event.redirectUrl} </Typography>
+                                        <Typography fontSize={theme.typography.caption}>Link Url</Typography>
+                                    </Box>
+                                </Grid>
+                            )}
+                        </Card>
+                    </Grid>
+
+                    <Grid item xs={12} sm={12} md={5.9} lg={5.9} xl={3.8}>
+                        <Card sx={{ width: '100%', padding: 3, display: 'flex', marginBottom: 1 }}>
+                            <Grid item>
+                                <Typography variant="h4">About Event</Typography>
+                                <Divider sx={{ marginY: 1 }} />
+                                <ReadMore text={event.event_description} maxLetters={250} />
                             </Grid>
                         </Card>
                         <Card sx={{ width: '100%', padding: 3, display: 'flex', justifyContent: 'space-between' }}>
                             <Grid display={'flex'} gap={2}>
-                                <Box sx={{ maxWidth: '46px', height: '46px', borderRadius: '50%', overflow: 'hidden' }}>
-                                    <img src={organizer.organizer_image} alt="event organizer" />
-                                </Box>
+                                <Avatar
+                                    size={50}
+                                    src={featuredImageUri + organizer.business_logo}
+                                    alt="event organizer"
+                                    style={{ resize: 'contain', aspectRatio: 1 }}
+                                />
+
                                 <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
-                                    <Typography fontSize={theme.typography.h4}>{organizer.organizer_name}</Typography>
-                                    <Typography fontWeight={theme.typography.fontWeightMedium}>{organizer.category}</Typography>
+                                    <Typography fontSize={theme.typography.h4}>{organizer.business_name}</Typography>
+                                    <Typography fontWeight={theme.typography.fontWeightMedium}>{organizer.business_category}</Typography>
                                     <Typography>
                                         <Typography display={'inline'} fontWeight={theme.typography.fontWeightBold}>
                                             {organizer.events}
-                                        </Typography>{' '}
+                                        </Typography>
                                         events
                                     </Typography>
                                 </Grid>
                             </Grid>
                             <Grid display={'flex'}>
-                                <Typography variant="h3">{organizer.rating}</Typography>
+                                <Typography variant="h4">{organizer.rating}</Typography>
                                 <StarIcon sx={{ width: '12px', height: '12px', color: '#FFBB00', marginTop: 0.5 }} />
                             </Grid>
                         </Card>
                         <Grid item mt={2}>
                             <Button
-                                variant="outlined"
+                                variant="text"
                                 sx={{ width: '103px' }}
                                 onClick={() => navigate('/update-event', { state: { ...event } })}
                             >
-                                Edit
+                                Update
                             </Button>
-                            <Button variant="text" sx={{ color: '#383838' }}>
-                                Postpone
-                            </Button>
-                            <Button variant="text" sx={{ color: '#FF1D1D' }}>
-                                Cancel
+
+                            <Button variant="text" sx={{ color: '#808080' }} onClick={() => handleDialogOpen()}>
+                                Delete
                             </Button>
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid container sx={{ width: '100%' }}>
-                    <Card sx={{ width: '100%' }}>
-                        <Box sx={{ width: '100%', typography: 'body1' }}>
+
+                <Grid container>
+                    <Grid item xs={12} sm={12} md={8} lg={7.9} xl={7.9}>
+                        <Card sx={{ width: '100%' }}>
                             <TabContext value={tabValue}>
-                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                    <TabList onChange={handleTabChange} sx={{ width: '100%', bgcolor: '#FFF9E8' }} className="custom-tabs">
-                                        <Tab sx={{ flex: 1 }} value="map" label="Map" />
-                                        <Tab sx={{ flex: 1 }} value="tickets" label="Tickets" />
-                                        <Tab sx={{ flex: 1 }} value="speakers" label="Speakers" />
-                                        <Tab sx={{ flex: 1 }} value="schedule" label="Schedule" />
-                                        <Tab sx={{ flex: 1 }} value="sponsor" label="Sponsor" />
-                                        <Tab sx={{ flex: 1 }} value="attendees" label="Attendees" />
-                                    </TabList>
-                                </Box>
+                                <TabList
+                                    onChange={handleTabChange}
+                                    sx={{ width: '100%' }}
+                                    className="custom-tabs "
+                                    variant="fullWidth"
+                                    aria-label="full width tabs example"
+                                >
+                                    <Tab value="map" label="Map" />
+                                    <Tab value="tickets" label="Tickets" />
+                                    <Tab value="speakers" label="Speakers" />
+                                    <Tab value="schedule" label="Schedule" />
+                                    <Tab value="sponsor" label="Sponsor" />
+                                    <Tab value="attendees" label="Attendees" />
+                                </TabList>
+
                                 <TabPanel value="map">
                                     <Grid padding={3}>
                                         <Grid item display={'flex'} gap={3}>
-                                            <Box sx={{ width: '30px', height: '30px', bgcolor: '#F3F3F3', borderRadius: '15px' }}></Box>
+                                            <Avatar size={32} sx={{ bgcolor: theme.palette.primary.light, color: theme.palette.dark.main }}>
+                                                <IconMapPin />
+                                            </Avatar>
                                             <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
                                                 <Typography fontSize={theme.typography.h4}>{event.event_address}</Typography>
                                                 <Typography fontSize={theme.typography.caption}>Event Address</Typography>
@@ -251,21 +625,41 @@ const EventDetail = () => {
                                                 defaultCenter={defaultProps.center}
                                                 defaultZoom={defaultProps.zoom}
                                             >
-                                                <Card lat={event.address_latitude} lng={event.address_longitude} text="Here"></Card>
+                                                <Marker lat={event.address_latitude} lng={event.address_longitude} />
                                             </GoogleMapReact>
                                         </Box>
                                     </Grid>
                                 </TabPanel>
-                                <TabPanel value="tickets"> tickets is currently in development and will be available soon. </TabPanel>
-                                <TabPanel value="speakers">speakers is currently in development and will be available soon. </TabPanel>
-                                <TabPanel value="schedule">schedule is currently in development and will be available soon. </TabPanel>
-                                <TabPanel value="sponsor">sponsor is currently in development and will be available soon. </TabPanel>
-                                <TabPanel value="attendees">attendees is currently in development and will be available soon. </TabPanel>
+                                <TabPanel value="tickets"> Tickets List Coming soon </TabPanel>
+                                <TabPanel value="speakers">Speakers List Coming soon </TabPanel>
+                                <TabPanel value="schedule">Schedule List Coming soon </TabPanel>
+                                <TabPanel value="sponsor">Sponsors List Coming soon </TabPanel>
+                                <TabPanel value="attendees">Attendes List Coming soon </TabPanel>
                             </TabContext>
-                        </Box>
-                    </Card>
+                        </Card>
+                    </Grid>
                 </Grid>
             </Grid>
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                <DialogTitle>Deleting Event</DialogTitle>
+                <DialogContent sx={{ textAlign: 'center' }}>
+                    <Typography>You are about to delete - {event.event_name}</Typography>
+                    <Typography sx={{ marginTop: 2 }}>Are you sure?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="text" color="dark" onClick={handleDialogClose}>
+                        No
+                    </Button>
+                    <Button variant="text" color="error" onClick={() => Delete(event.id)}>
+                        {spinner ? <CircularProgress size={18} /> : 'Yes'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </Grid>
     );
 };

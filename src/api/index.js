@@ -1,9 +1,9 @@
 const Connections = {
     api: 'http://192.168.100.3:8000/api/',
-
+    url: 'http://192.168.100.3:8000/api/',
     //admin dashboard end points
     adminsignin: 'adminsignin',
-
+    changeEventStatus: 'change-event-status/',
     // end users api end points
     signUp: 'signup',
     signIn: 'signin',
@@ -17,10 +17,15 @@ const Connections = {
     ChangePassword: 'changepassword',
 
     //event related api's
-    events: 'events',
-    eventDetails: 'single-event/',
-    moreEventDetails: 'event-more-detail',
     AddEvent: 'add-event',
+    events: 'events',
+    eventDetail: 'single-event/',
+    moreEventDetails: 'event-more-detail',
+    sectionOneUpdate: 'section-one-update/',
+    sectionTwoUpdate: 'section-two-update/',
+    sectionThreeUpdate: 'section-three-update/',
+    sectionFourUpdate: 'section-four-update/',
+    deleteEvent: 'delete-event/',
     TodayEvents: 'today-events',
     WeekEvents: 'week-events',
     UpcomingEvents: 'upcoming-events',

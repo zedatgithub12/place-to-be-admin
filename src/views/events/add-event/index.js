@@ -1,6 +1,6 @@
 // material-ui
 import { Add, ExpandMore } from '@mui/icons-material';
-
+import { useRef, useState, forwardRef } from 'react';
 import {
     Grid,
     Typography,
@@ -18,54 +18,80 @@ import {
     Select,
     FormControl,
     InputLabel,
-    MenuItem
+    MenuItem,
+    useTheme
 } from '@mui/material';
 import { Box } from '@mui/system';
-import { IconUpload } from '@tabler/icons';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker, TimePicker } from '@mui/x-date-pickers';
-import { useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
-import dayjs from 'dayjs';
-import events from '../../data/events'; //dummy data
+import { useNavigate } from 'react-router';
+import Connections from 'api';
+import placeholder from 'assets/images/placeholder.jpg';
+import GoogleMapReact from 'google-map-react';
+import pin from 'assets/icons/marker.svg';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
-// ==============================|| Add Events PAGE ||============================== //
+// ==============================|| EVENT ADDING PAGE ||============================== //
 
-const UpdateEvent = () => {
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const Marker = () => (
+    <div className="marker">
+        <img src={pin} alt="marker" width={30} height={30} />
+    </div>
+);
+
+const AddEvent = () => {
     const navigate = useNavigate();
-    const [activeAccordion, setActiveAccordion] = useState(0);
-    const { state } = useLocation();
-
-    const event = events[0];
+    const theme = useTheme();
     const fileInputRef = useRef(null);
 
+    const userId = async () => sessionStorage.getItem('user');
+    const [activeAccordion, setActiveAccordion] = useState(0);
+    const [posterPreview, setPosterPreview] = useState(null);
+    const [selectedLocation, setSelectedLocation] = useState({ lat: null, lng: null });
+
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
+
     const [formData, setFormData] = useState({
-        title: event.event_name,
-        description: event.event_description,
-        startDate: event.start_date,
-        endDate: event.end_date,
-        startTime: event.start_time,
-        endTime: event.end_time,
-        eventAddress: event.event_address,
-        eventType: event.event_type,
-        eventCategory: event.category,
-        regularPrice: event.event_entrance_fee,
-        phones: [event.contact_phone, event.contact_phone_2],
-        linkUrl: event.redirectUrl,
-        poster: event.event_image,
-        buttonLabel: event.link_label
+        title: '',
+        description: '',
+        startDate: '',
+        endDate: '',
+        startTime: '',
+        endTime: '',
+        eventAddress: '',
+        latitude: '',
+        longitude: '',
+        eventCategory: '',
+        eventType: 'free',
+        regularPrice: '',
+        phone: '',
+        phone2: '',
+        linkUrl: '',
+        buttonLabel: 'register',
+        poster: null
     });
-
-    const [forAdapterJS, setForAdapterJS] = useState({
-        startDate: dayjs(event.start_date),
-        endDate: dayjs(event.end_date),
-        startTime: dayjs(event.start_time),
-        endTime: dayjs(event.end_time)
-    });
-
-    const [posterPreview, setPosterPreview] = useState(formData.poster);
+    const handleMapClick = ({ lat, lng }) => {
+        setSelectedLocation({ lat, lng });
+        setFormData({ ...formData, latitude: lat, longitude: lng });
+    };
     const handleResetClick = (index) => () => {
         let updatedFormData = { ...formData };
 
@@ -81,7 +107,8 @@ const UpdateEvent = () => {
             updatedFormData.eventAddress = '';
             updatedFormData.eventCategory = '';
         } else if (index === 3) {
-            updatedFormData.phones = [];
+            updatedFormData.phone = '';
+            updatedFormData.phone2 = '';
             updatedFormData.linkUrl = '';
             updatedFormData.buttonLabel = '';
         }
@@ -91,10 +118,10 @@ const UpdateEvent = () => {
 
     const handlePosterUpload = (event) => {
         const file = event.target.files[0];
-        setFormData((prevData) => ({
-            ...prevData,
-            ['poster']: file
-        }));
+        setFormData({
+            ...formData,
+            poster: file
+        });
         if (file) {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -104,121 +131,77 @@ const UpdateEvent = () => {
         }
     };
 
-    const formatDate = (date) => {
-        return dayjs(date).format('YYYY-MM-DD');
-    };
-
-    const formatTime = (time) => {
-        return dayjs(time).format('hh:mm:ss');
-    };
     const handleFieldChange = (fieldName, value) => {
-        if (fieldName === 'phones[0]') {
-            setFormData((prevData) => ({
-                ...prevData,
-                phones: [value, prevData.phones[1]]
-            }));
-        } else if (fieldName === 'phones[1]') {
-            setFormData((prevData) => ({
-                ...prevData,
-                phones: [prevData.phones[0], value]
-            }));
-        } else if (fieldName === 'startDate' || fieldName === 'endDate') {
-            const formattedDate = formatDate(value);
-            setForAdapterJS((prevData) => ({
-                ...prevData,
-                [fieldName]: value
-            }));
-            setFormData((prevData) => ({
-                ...prevData,
-                [fieldName]: formattedDate
-            }));
-        } else if (fieldName === 'startTime' || fieldName === 'endTime') {
-            const formattedTime = formatTime(value);
-            setForAdapterJS((prevData) => ({
-                ...prevData,
-                [fieldName]: value
-            }));
-            setFormData((prevData) => ({
-                ...prevData,
-                [fieldName]: formattedTime
-            }));
-        } else {
-            setFormData((prevData) => ({
-                ...prevData,
-                [fieldName]: value
-            }));
-        }
+        setFormData({
+            ...formData,
+            [fieldName]: value
+        });
     };
 
-    const handleBasicInfoChange = (e) => {
-        e.preventDefault();
-        // Update event with formData
-        const updatedEvent = {
-            ...event,
-            title: formData.title,
-            description: formData.description,
-            poster: formData.poster
-        };
-
-        // Send the updated event to the backend
-        console.log(updatedEvent);
+    const handleNext = () => {
+        setActiveAccordion((prev) => prev + 1);
     };
 
-    const handleEventSessionChange = (e) => {
+    const handleOnSubmit = (e) => {
         e.preventDefault();
-        // Update event with formData
-        const updatedEvent = {
-            ...event,
-            startDate: formData.startDate,
-            endDate: formData.endDate,
-            startTime: formData.startTime,
-            endTime: formData.endTime
-            // ... Other properties
-        };
+        var id = userId.id;
 
-        // Send the updated event to the backend
-        console.log(updatedEvent);
-    };
+        const data = new FormData();
+        data.append('userId', '1');
+        data.append('event_image', formData.poster);
+        data.append('event_name', formData.title);
+        data.append('event_description', formData.description);
+        data.append('start_date', formData.startDate);
+        data.append('start_time', formData.startTime);
+        data.append('end_date', formData.endDate);
+        data.append('end_time', formData.endTime);
+        data.append('category', formData.eventCategory);
+        data.append('event_address', formData.eventAddress);
+        data.append('latitude', selectedLocation.lat);
+        data.append('longitude', selectedLocation.lng);
+        data.append('contact_phone', formData.phone);
+        data.append('contact_phone_2', formData.phone2);
+        data.append('link_label', formData.link_label);
+        data.append('redirectUrl', formData.redirectUrl);
+        data.append('event_type', formData.eventType);
+        data.append('event_entrance_fee', formData.regularPrice);
 
-    const handleEventDetailChange = (e) => {
-        e.preventDefault();
-        // Update event with formData
-        const updatedEvent = {
-            ...event,
-            eventAddress: formData.eventAddress,
-            eventType: formData.eventType,
-            eventCategory: formData.eventCategory,
-            regularPrice: formData.regularPrice
-            // ... Other properties
-        };
-
-        // Send the updated event to the backend
-        console.log(updatedEvent);
-    };
-
-    const handleContactInfoChange = (e) => {
-        e.preventDefault();
-        // Update event with formData
-        const updatedEvent = {
-            ...event,
-            linkUrl: formData.linkUrl,
-            buttonLabel: formData.buttonLabel,
-            phones: formData.phones
-            // ... Other properties
-        };
-
-        // Send the updated event to the backend
-        console.log(updatedEvent);
+        var Api = Connections.api + Connections.AddEvent;
+        fetch(Api, {
+            method: 'POST',
+            body: data
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                }
+            })
+            .catch((error) => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: error.message
+                });
+            });
     };
 
     const handleAccordionChange = (panel) => (event, isExpanded) => {
         setActiveAccordion(isExpanded ? panel : false);
     };
-
-    const handleIconClick = () => {
-        fileInputRef.current.click();
-    };
-
     return (
         <Grid container>
             <Grid
@@ -231,12 +214,14 @@ const UpdateEvent = () => {
                 m={1}
                 sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
             >
-                <Typography variant="h2">Update Events</Typography>
+                <Typography variant="h3" sx={{ marginLeft: 3 }}>
+                    Add Event
+                </Typography>
                 <Button
-                    variant="contained"
+                    variant="text"
                     size="small"
-                    sx={{ width: '100px', bgcolor: '#D1E9FF', color: '#0065DB', '&:hover': { color: 'white' } }}
-                    onClick={() => navigate('/event-detail')}
+                    sx={{ paddingX: 5, marginRight: 2, color: theme.palette.primary.main, '&:hover': { color: 'dark' } }}
+                    onClick={() => navigate('/events')}
                 >
                     Back
                 </Button>
@@ -246,76 +231,117 @@ const UpdateEvent = () => {
                 <Grid container sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Grid item xs={12} sm={12} md={6} lg={5.5} xl={5.5} mb={{ xs: 2, sm: 2, md: 2, lg: 0 }}>
                         <Card sx={{ width: '100%', padding: 3 }}>
-                            <Typography variant="h3">Add</Typography>
-                            <Divider sx={{ width: '100%', mb: 3 }} bgcolor="#B6B6B6" />
-                            <Box component="form" onSubmit={handleBasicInfoChange}>
+                            <Typography variant="h5"> Add event details</Typography>
+                            <Box sx={{ marginY: 3 }}></Box>
+                            <form onSubmit={handleOnSubmit}>
                                 <Accordion expanded={activeAccordion === 0} onChange={handleAccordionChange(0)}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMore />}
-                                        sx={{ bgcolor: '#F3F3F3', mb: 1, borderRadius: '5px', border: 'none' }}
+                                        sx={{ bgcolor: theme.palette.primary.light, mb: 1, borderRadius: '5px', border: 'none' }}
                                     >
                                         <Typography>Basic information</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <Grid container display={'flex'} flexDirection={'column'}>
-                                            <Box>
-                                                <Box
+                                            <Grid item xs={12}>
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={1}
                                                     sx={{
-                                                        bgcolor: '#F3F3F3',
-                                                        width: '100%',
                                                         padding: 2,
-                                                        display: 'flex',
-                                                        justifyContent: 'center',
+                                                        borderRadius: '8px',
                                                         alignItems: 'center',
-                                                        flexDirection: 'column',
-                                                        borderRadius: '8px'
+                                                        justifyContent: 'center',
+                                                        bgcolor: theme.palette.primary.light
                                                     }}
                                                 >
-                                                    {posterPreview ? (
-                                                        <img src={posterPreview} alt="Poster Preview" style={{ maxWidth: '30%' }} />
-                                                    ) : (
-                                                        <Stack direction="row" alignItems="center" spacing={2}>
-                                                            <IconButton aria-label="upload picture" onClick={handleIconClick}>
-                                                                <input
-                                                                    ref={fileInputRef}
-                                                                    onChange={handlePosterUpload}
-                                                                    hidden
-                                                                    accept="image/*"
-                                                                    type="file"
-                                                                />
-                                                                <IconUpload style={{ color: '#94C5FF' }} />
-                                                            </IconButton>
-                                                        </Stack>
-                                                    )}
-                                                    <Typography variant="h3" color={'#0065DB'}>
-                                                        {formData.poster ? formData.poster.name : 'Upload Poster'}
-                                                    </Typography>
-                                                </Box>
-                                                <Box display={'flex'} flexDirection={'column'}>
+                                                    <input
+                                                        ref={fileInputRef}
+                                                        onChange={handlePosterUpload}
+                                                        hidden
+                                                        accept="image/*"
+                                                        type="file"
+                                                        id="event-poster"
+                                                    />
+                                                    <label htmlFor="event-poster">
+                                                        <div>
+                                                            {posterPreview ? (
+                                                                <Box>
+                                                                    <img
+                                                                        src={posterPreview}
+                                                                        alt="poster"
+                                                                        style={{
+                                                                            width: 400,
+                                                                            maxWidth: 600,
+                                                                            height: 400,
+                                                                            maxHeight: 600,
+                                                                            aspectRatio: 1,
+                                                                            resize: 'cover',
+                                                                            borderRadius: 6
+                                                                        }}
+                                                                    />
+                                                                </Box>
+                                                            ) : (
+                                                                <Box
+                                                                    sx={{
+                                                                        display: 'flex',
+                                                                        flexDirection: 'column',
+                                                                        alignContent: 'center'
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={placeholder}
+                                                                        alt="Poster"
+                                                                        style={{
+                                                                            width: 400,
+                                                                            height: 400,
+                                                                            aspectRatio: 1,
+                                                                            resize: 'contain'
+                                                                        }}
+                                                                    />
+                                                                    <Typography
+                                                                        variant="subtitle1"
+                                                                        color={'#0065DB'}
+                                                                        sx={{ textAlign: 'center' }}
+                                                                    >
+                                                                        {formData.poster ? formData.poster.name : 'Upload Poster'}
+                                                                    </Typography>
+                                                                </Box>
+                                                            )}
+                                                        </div>
+                                                    </label>
+                                                </Stack>
+
+                                                <Grid item xl={12}>
                                                     <Typography variant="h5" mt={2}>
                                                         Title
                                                     </Typography>
                                                     <TextField
+                                                        fullWidth
                                                         style={{ marginTop: 2 }}
                                                         size="small"
-                                                        fullWidth
                                                         required
                                                         value={formData.title}
                                                         onChange={(e) => handleFieldChange('title', e.target.value)}
                                                     />
+                                                </Grid>
+
+                                                <Grid item xs={12}>
                                                     <Typography variant="h5" mt={2}>
                                                         Description
                                                     </Typography>
                                                     <TextField
-                                                        style={{ marginTop: 2 }}
                                                         fullWidth
+                                                        style={{ marginTop: 2 }}
                                                         multiline
-                                                        maxRows={10}
+                                                        rows={4}
+                                                        maxRows={20}
                                                         required
                                                         value={formData.description}
                                                         onChange={(e) => handleFieldChange('description', e.target.value)}
                                                     />
-                                                </Box>
+                                                </Grid>
+
                                                 <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2 }}>
                                                     <Button
                                                         variant="text"
@@ -328,21 +354,19 @@ const UpdateEvent = () => {
                                                         variant="outlined"
                                                         size="small"
                                                         sx={{ width: '61px', height: '25px' }}
-                                                        type="submit"
+                                                        onClick={handleNext}
                                                     >
-                                                        Update
+                                                        Next
                                                     </Button>
                                                 </Box>
-                                            </Box>
+                                            </Grid>
                                         </Grid>
                                     </AccordionDetails>
                                 </Accordion>
-                            </Box>
-                            <Box component="form" onSubmit={handleEventSessionChange}>
                                 <Accordion expanded={activeAccordion === 1} onChange={handleAccordionChange(1)}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMore />}
-                                        sx={{ bgcolor: '#F3F3F3', mb: 1, borderRadius: '5px', border: 'none' }}
+                                        sx={{ bgcolor: theme.palette.primary.light, mb: 1, borderRadius: '5px', border: 'none' }}
                                     >
                                         <Typography>Event Session</Typography>
                                     </AccordionSummary>
@@ -351,52 +375,43 @@ const UpdateEvent = () => {
                                             <Box display={'flex'} gap={2}>
                                                 <Box display={'flex'} flexDirection={'column'} sx={{ flex: 1 }}>
                                                     <Typography variant="h5">Start Date</Typography>
-                                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                        <DemoContainer components={['DatePicker']}>
-                                                            <DatePicker
-                                                                label="Start Date"
-                                                                value={forAdapterJS.startDate}
-                                                                onChange={(newDate) => handleFieldChange('startDate', newDate)}
-                                                            />
-                                                        </DemoContainer>
-                                                    </LocalizationProvider>
 
+                                                    <TextField
+                                                        type="date"
+                                                        name="startDate"
+                                                        value={formData.startDate}
+                                                        onChange={(event) => handleFieldChange('startDate', event.target.value)}
+                                                    />
                                                     <Typography variant="h5" mt={1}>
                                                         End Date
                                                     </Typography>
-                                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                        <DemoContainer components={['DatePicker']}>
-                                                            <DatePicker
-                                                                label="End Date"
-                                                                value={forAdapterJS.endDate}
-                                                                onChange={(newDate) => handleFieldChange('endDate', newDate)}
-                                                            />
-                                                        </DemoContainer>
-                                                    </LocalizationProvider>
+
+                                                    <TextField
+                                                        type="date"
+                                                        name="endDate"
+                                                        value={formData.endDate}
+                                                        onChange={(event) => handleFieldChange('endDate', event.target.value)}
+                                                    />
                                                 </Box>
                                                 <Box display={'flex'} flexDirection={'column'} sx={{ flex: 1 }}>
                                                     <Typography variant="h5">Start Time</Typography>
-                                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                        <DemoContainer components={['TimePicker']}>
-                                                            <TimePicker
-                                                                label="Start Time"
-                                                                value={forAdapterJS.startTime}
-                                                                onChange={(newTime) => handleFieldChange('startTime', newTime)}
-                                                            />
-                                                        </DemoContainer>
-                                                    </LocalizationProvider>
+
+                                                    <TextField
+                                                        type="time"
+                                                        name="startTime"
+                                                        value={formData.startTime}
+                                                        onChange={(event) => handleFieldChange('startTime', event.target.value)}
+                                                    />
+
                                                     <Typography variant="h5" mt={1}>
                                                         End Time
                                                     </Typography>
-                                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                        <DemoContainer components={['TimePicker']}>
-                                                            <TimePicker
-                                                                label="End Time"
-                                                                value={forAdapterJS.endTime}
-                                                                onChange={(newTime) => handleFieldChange('endTime', newTime)}
-                                                            />
-                                                        </DemoContainer>
-                                                    </LocalizationProvider>
+                                                    <TextField
+                                                        type="time"
+                                                        name="endTime"
+                                                        value={formData.endTime}
+                                                        onChange={(event) => handleFieldChange('endTime', event.target.value)}
+                                                    />
                                                 </Box>
                                             </Box>
                                             <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2 }}>
@@ -411,20 +426,18 @@ const UpdateEvent = () => {
                                                     variant="outlined"
                                                     size="small"
                                                     sx={{ width: '61px', height: '25px' }}
-                                                    type="submit"
+                                                    onClick={handleNext}
                                                 >
-                                                    Update
+                                                    Next
                                                 </Button>
                                             </Box>
                                         </Grid>
                                     </AccordionDetails>
                                 </Accordion>
-                            </Box>
-                            <Box component="form" onSubmit={handleEventDetailChange}>
                                 <Accordion expanded={activeAccordion === 2} onChange={handleAccordionChange(2)}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMore />}
-                                        sx={{ bgcolor: '#F3F3F3', mb: 1, borderRadius: '5px', border: 'none' }}
+                                        sx={{ bgcolor: theme.palette.primary.light, mb: 1, borderRadius: '5px', border: 'none' }}
                                     >
                                         <Typography>Event Detail</Typography>
                                     </AccordionSummary>
@@ -449,7 +462,6 @@ const UpdateEvent = () => {
                                                             value={formData.eventType}
                                                             onChange={(e) => handleFieldChange('eventType', e.target.value)}
                                                             label="event type"
-                                                            required
                                                         >
                                                             <MenuItem value={'paid'}>Paid</MenuItem>
                                                             <MenuItem value={'free'}>Free</MenuItem>
@@ -475,10 +487,26 @@ const UpdateEvent = () => {
                                                         style={{ marginTop: 5 }}
                                                         size="small"
                                                         fullWidth
-                                                        required
                                                     />
                                                 </Box>
                                             </Box>
+
+                                            <Grid item xs={12} sx={{ padding: 2, marginY: 1, borderRadius: 6 }}>
+                                                <Typography sx={{ paddingBottom: 1 }}>Select location on the map</Typography>
+                                                <Box sx={{ height: 400, width: '100%' }}>
+                                                    <GoogleMapReact
+                                                        defaultCenter={{ lat: 9.0108, lng: 38.7617 }} // Set the default center of the map
+                                                        defaultZoom={12} // Set default zoom level
+                                                        onClick={handleMapClick} // Call handleMapClick function when the map is clicked
+                                                    >
+                                                        {/* Marker to show the selected location */}
+                                                        {selectedLocation.lat && selectedLocation.lng && (
+                                                            <Marker lat={selectedLocation.lat} lng={selectedLocation.lng} />
+                                                        )}
+                                                    </GoogleMapReact>
+                                                </Box>
+                                            </Grid>
+
                                             <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2 }}>
                                                 <Button
                                                     variant="text"
@@ -491,18 +519,19 @@ const UpdateEvent = () => {
                                                     variant="outlined"
                                                     size="small"
                                                     sx={{ width: '61px', height: '25px' }}
-                                                    type="submit"
+                                                    onClick={handleNext}
                                                 >
-                                                    Update
+                                                    Next
                                                 </Button>
                                             </Box>
                                         </Grid>
                                     </AccordionDetails>
                                 </Accordion>
-                            </Box>
-                            <Box component="form" onSubmit={handleContactInfoChange}>
                                 <Accordion expanded={activeAccordion === 3} onChange={handleAccordionChange(3)}>
-                                    <AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: '#F3F3F3' }}>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMore />}
+                                        sx={{ bgcolor: theme.palette.primary.light, mb: 1, borderRadius: '5px', border: 'none' }}
+                                    >
                                         <Typography>Contact information</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
@@ -512,21 +541,19 @@ const UpdateEvent = () => {
                                                     <Box flex={1}>
                                                         <Typography variant="h5">Phone 1</Typography>
                                                         <TextField
-                                                            value={formData.phones[0]}
-                                                            onChange={(e) => handleFieldChange('phones[0]', e.target.value)}
+                                                            value={formData.phone}
+                                                            onChange={(e) => handleFieldChange('phone', e.target.value)}
                                                             size="small"
                                                             fullWidth
-                                                            required
                                                         />
                                                     </Box>
                                                     <Box flex={1}>
                                                         <Typography variant="h5">Phone 2</Typography>
                                                         <TextField
-                                                            value={formData.phones[1]}
+                                                            value={formData.phone2}
                                                             size="small"
-                                                            onChange={(e) => handleFieldChange('phones[1]', e.target.value)}
+                                                            onChange={(e) => handleFieldChange('phone2', e.target.value)}
                                                             fullWidth
-                                                            required
                                                         />
                                                     </Box>
                                                 </Box>
@@ -561,26 +588,29 @@ const UpdateEvent = () => {
                                                     onChange={(e) => handleFieldChange('linkUrl', e.target.value)}
                                                     size="small"
                                                     fullWidth
-                                                    required
                                                 />
                                             </Box>
                                             <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2 }}>
-                                                <Button variant="text" sx={{ color: '#1E1E1E' }} onClick={handleResetClick(3)}>
+                                                <Button
+                                                    variant="text"
+                                                    sx={{ color: '#1E1E1E', width: '138px', height: '33px' }}
+                                                    onClick={handleResetClick(3)}
+                                                >
                                                     Reset
                                                 </Button>
                                                 <Button
-                                                    variant="outlined"
-                                                    size="small"
-                                                    sx={{ width: '61px', height: '25px' }}
                                                     type="submit"
+                                                    variant="contained"
+                                                    size="small"
+                                                    sx={{ bgcolor: '#0065DB', width: '138px', height: '33px' }}
                                                 >
-                                                    Update
+                                                    Post
                                                 </Button>
                                             </Box>
                                         </Grid>
                                     </AccordionDetails>
                                 </Accordion>
-                            </Box>
+                            </form>
                         </Card>
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
@@ -588,16 +618,7 @@ const UpdateEvent = () => {
                             <Typography sx={{ padding: 3, paddingBottom: 1 }} variant="h3">
                                 Preview
                             </Typography>
-                            <Box sx={{ width: '100%' }}>
-                                <Tabs style={{ color: 'black', height: '30px' }}>
-                                    <Tab value="mobile" label="mobile">
-                                        Mobile
-                                    </Tab>
-                                    <Tab value="web" label="web">
-                                        Web
-                                    </Tab>
-                                </Tabs>
-                            </Box>
+
                             <Grid item sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                 <Typography variant="h1" color={'#DEDEDE'}>
                                     To be designed and developed
@@ -607,8 +628,13 @@ const UpdateEvent = () => {
                     </Grid>
                 </Grid>
             </Grid>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </Grid>
     );
 };
 
-export default UpdateEvent;
+export default AddEvent;

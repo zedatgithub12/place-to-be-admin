@@ -21,8 +21,8 @@ const ChangePassword = Loadable(lazy(() => import('views/audience/changePassword
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const Events = Loadable(lazy(() => import('views/events')));
 const EventDetail = Loadable(lazy(() => import('views/Event-details/EventDetail')));
-const AddEvent = Loadable(lazy(() => import('views/add-event')));
-const UpdateEvent = Loadable(lazy(() => import('views/update-event')));
+const AddEvent = Loadable(lazy(() => import('views/events/add-event')));
+const UpdateEvent = Loadable(lazy(() => import('views/events/update-event')));
 const CustomerSupport = Loadable(lazy(() => import('views/customer-support')));
 
 // ==============================|| MAIN ROUTING ||============================== //
