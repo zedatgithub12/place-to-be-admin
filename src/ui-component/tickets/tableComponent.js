@@ -9,11 +9,13 @@ import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TablePagination from '@mui/material/TablePagination';
+import { useNavigate } from 'react-router';
 
 const TableComponent = ({ data, status, fixedRows, searchQuery }) => {
     const [tableData, setTableData] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const navigate = useNavigate();
 
     const fetchTableData = () => {
         const filteredData = data.filter((item) => {
@@ -80,7 +82,11 @@ const TableComponent = ({ data, status, fixedRows, searchQuery }) => {
                                   </TableRow>
                               ))
                         ).map((item) => (
-                            <TableRow key={item.id}>
+                            <TableRow
+                                key={item.id}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                                onClick={() => navigate('/ticket-detail', { state: { ...item } })}
+                            >
                                 <TableCell style={{ fontSize: '0.8rem', padding: '6px 12px' }}>{item.id}</TableCell>
                                 <TableCell style={{ fontSize: '0.8rem', padding: '6px 12px' }}>{item.event_name}</TableCell>
                                 <TableCell style={{ fontSize: '0.8rem', padding: '6px 12px' }}>{item.username}</TableCell>

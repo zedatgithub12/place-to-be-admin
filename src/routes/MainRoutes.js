@@ -24,6 +24,7 @@ const EventDetail = Loadable(lazy(() => import('views/Event-details/EventDetail'
 const AddEvent = Loadable(lazy(() => import('views/events/add-event')));
 const UpdateEvent = Loadable(lazy(() => import('views/events/update-event')));
 const CustomerSupport = Loadable(lazy(() => import('views/customer-support')));
+const TicketDetail = Loadable(lazy(() => import('views/ticket-details')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -124,6 +125,10 @@ const MainRoutes = {
         {
             path: 'tickets',
             element: <Tickets />
+        },
+        {
+            path: 'ticket-detail',
+            element: <TicketDetail />
         }
     ]
 };
