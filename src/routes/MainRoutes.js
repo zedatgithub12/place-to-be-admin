@@ -4,6 +4,7 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import Tickets from 'views/tickets';
+import AudienceDetail from 'views/users/audience/audienceDetail';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -14,8 +15,8 @@ const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
 const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 const UtilsMaterialIcons = Loadable(lazy(() => import('views/utilities/MaterialIcons')));
 const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons')));
-const Audience = Loadable(lazy(() => import('views/audience/index')));
-const ChangePassword = Loadable(lazy(() => import('views/audience/changePassword')));
+const Audience = Loadable(lazy(() => import('views/users/audience')));
+const ChangePassword = Loadable(lazy(() => import('views/users/audience/changePassword')));
 
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
@@ -89,10 +90,7 @@ const MainRoutes = {
                 }
             ]
         },
-        {
-            path: 'audience',
-            element: <Audience />
-        },
+
         {
             path: 'change-password',
             element: <ChangePassword />
@@ -124,6 +122,14 @@ const MainRoutes = {
         {
             path: 'tickets',
             element: <Tickets />
+        },
+        {
+            path: 'audience',
+            element: <Audience />
+        },
+        {
+            path: 'audience-detail',
+            element: <AudienceDetail />
         }
     ]
 };

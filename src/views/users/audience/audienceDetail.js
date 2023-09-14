@@ -7,8 +7,9 @@ import ConfirmationNumberOutlinedIcon from '@mui/icons-material/ConfirmationNumb
 import DoneIcon from '@mui/icons-material/Done';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import profileImage from '../../assets/images/profile.svg';
+import profileImage from 'assets/images/profile.svg';
 import AudienceData from 'data/eventAudience';
+
 const AudienceDetail = (props) => {
     const foundData = AudienceData.find((item) => item.id === props.id);
     return (

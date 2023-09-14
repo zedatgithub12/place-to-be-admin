@@ -84,38 +84,36 @@ const ProfileSection = () => {
 
     return (
         <>
-            <Chip
+            <Box
                 sx={{
-                    height: '42px',
-                    width: '62px',
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center'
                 }}
-                icon={
-                    <Avatar
-                        src={<IconUser size={22} />}
-                        sx={{
-                            ...theme.typography.mediumAvatar,
-
-                            cursor: 'pointer',
-                            background: theme.palette.warning.light,
-                            color: theme.palette.warning.main,
-                            alignSelf: 'center'
-                        }}
-                        ref={anchorRef}
-                        aria-controls={open ? 'menu-list-grow' : undefined}
-                        aria-haspopup="true"
-                        color={theme.palette.warning.dark}
-                    />
-                }
                 variant="outlined"
                 ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}
                 aria-haspopup="true"
                 onClick={handleToggle}
                 color="warning"
-            />
+            >
+                <Avatar
+                    src={<IconUser size={22} />}
+                    sx={{
+                        ...theme.typography.mediumAvatar,
+
+                        cursor: 'pointer',
+                        background: theme.palette.warning.light,
+                        color: theme.palette.dark.main,
+                        alignSelf: 'center'
+                    }}
+                    ref={anchorRef}
+                    aria-controls={open ? 'menu-list-grow' : undefined}
+                    aria-haspopup="true"
+                    color={theme.palette.warning.dark}
+                />
+            </Box>
+
             <Popper
                 placement="bottom-end"
                 open={open}

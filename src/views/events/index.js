@@ -1,33 +1,18 @@
 // material-ui
-import {
-    Typography,
-    Grid,
-    Paper,
-    IconButton,
-    InputBase,
-    Divider,
-    InputLabel,
-    FormControl,
-    Select,
-    MenuItem,
-    Box,
-    Button
-} from '@mui/material';
+import { Typography, Grid, Paper, IconButton, InputBase, Divider, FormControl, Select, MenuItem, Button } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
 import { Search } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
 import events from 'data/events';
 import LeftEventPanel from './LeftEventPanel';
-import myEvents from 'data/myEvents'; // dummy data for panel 2
 import RightEventPanel from './RightEventPanel';
 import { useNavigate } from 'react-router';
 import Connections from 'api';
 
-// ==============================|| SAMPLE PAGE ||============================== //
+// ==============================|| EVENTS PAGE ||============================== //
 
 const Events = () => {
     const theme = useTheme();

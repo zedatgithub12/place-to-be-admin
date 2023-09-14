@@ -1,6 +1,8 @@
 const Connections = {
-    api: 'http://192.168.100.3:8000/api/',
-    url: 'http://192.168.100.3:8000/api/',
+    // api: 'http://192.168.100.3:8000/api/',
+    // url: 'http://192.168.100.3:8000/api/',
+    api: 'http://localhost:8000/api/',
+    url: 'http://localhost:8000/api/',
     //admin dashboard end points
     adminsignin: 'adminsignin',
     changeEventStatus: 'change-event-status/',
@@ -15,6 +17,9 @@ const Connections = {
     MetaData: 'meta-info/',
     updateUserInfo: 'update/',
     ChangePassword: 'changepassword',
+
+    //user related endpoints
+    users: 'users',
 
     //event related api's
     AddEvent: 'add-event',
@@ -69,7 +74,7 @@ const Connections = {
     Payment: 'payment',
     Event: 'single-event/', // a file to retrive single event by its event ID
     createReservation: 'create-reservation',
-    AvailableTickets: 'tickets',
+    Tickets: 'tickets',
     FeaturedEvent: 'featured-event',
     boughtTickets: 'soldticket/',
     singleTicket: 'single-ticket/',

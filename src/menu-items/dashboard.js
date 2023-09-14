@@ -82,7 +82,7 @@ const dashboard = {
             id: 'users',
             title: 'User',
             type: 'item',
-            url: '/sample-page',
+            url: '/audience',
             icon: icons.IconUsers,
             breadcrumbs: false
         },
