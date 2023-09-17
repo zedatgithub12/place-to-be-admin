@@ -142,12 +142,14 @@ const AddEvent = () => {
         setActiveAccordion((prev) => prev + 1);
     };
 
-    const handleOnSubmit = (e) => {
+    const handleOnSubmit = async (e) => {
         e.preventDefault();
+
+        const userId = sessionStorage.getItem('user');
         var id = userId.id;
 
         const data = new FormData();
-        data.append('userId', '1');
+        data.append('userId', id);
         data.append('event_image', formData.poster);
         data.append('event_name', formData.title);
         data.append('event_description', formData.description);

@@ -3,12 +3,14 @@ import { lazy } from 'react';
 // project imports
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
-import Tickets from 'views/tickets';
 import AudienceDetail from 'views/users/audience/audienceDetail';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
+//ticket routing
+const Tickets = Loadable(lazy(() => import('views/tickets')));
+const TicketDetail = Loadable(lazy(() => import('views/tickets/ticket-detail')));
 // utilities routing
 const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
 const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
@@ -122,6 +124,10 @@ const MainRoutes = {
         {
             path: 'tickets',
             element: <Tickets />
+        },
+        {
+            path: 'ticket-detail',
+            element: <TicketDetail />
         },
         {
             path: 'audience',

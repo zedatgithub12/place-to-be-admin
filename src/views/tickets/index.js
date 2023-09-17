@@ -26,6 +26,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import SplitButton from './components/Dropdown';
 import { IconX } from '@tabler/icons';
 import { TicketType } from 'data/ticket';
+import { useNavigate } from 'react-router';
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -34,15 +35,15 @@ const Alert = forwardRef(function Alert(props, ref) {
 const Tickets = () => {
     const theme = useTheme();
 
+    const navigate = useNavigate();
+
     const [data, setData] = useState([]);
     const [events, setEvents] = useState([]);
     const [lastPage, setLastPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [rowCountState, setRowCountState] = useState(lastPage);
     const [spinner, setSpinner] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [ttype, setTtype] = useState('Ticket Type');
 
     const [popup, setPopup] = useState({
         status: false,
@@ -62,7 +63,7 @@ const Tickets = () => {
         event_id: '',
         event_image: '',
         event_name: '',
-        tickettype: '',
+        tickettype: 'Ticket Type',
         price: '',
         qauntity: '',
         expiredate: ''
@@ -79,14 +80,6 @@ const Tickets = () => {
         });
     };
 
-    const handleMenuClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
     const handleDialogOpen = () => {
         setDialogOpen(true);
         GetUpcomingEvents();
@@ -97,7 +90,7 @@ const Tickets = () => {
     };
 
     const handleTicketTypeChange = (event) => {
-        setTtype(event.target.value);
+        setTicketData({ ...ticketData, tickettype: event.target.value });
     };
 
     const GetTickets = () => {
@@ -145,8 +138,69 @@ const Tickets = () => {
             });
     };
 
+    const handleAddTicket = async (e) => {
+        e.preventDefault();
+
+        if (!ticketData.tickettype || ticketData.tickettype === 'Ticket Type') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select ticket type'
+            });
+        } else {
+            var userInfo = await sessionStorage.getItem('user');
+            var user = JSON.parse(userInfo);
+
+            const data = new FormData();
+            data.append('userId', user.id);
+            data.append('eventId', ticketData.event_id);
+            data.append('eventName', ticketData.event_name);
+            data.append('eventImage', ticketData.event_image);
+            data.append('type', ticketData.tickettype);
+            data.append('price', ticketData.price);
+            data.append('amount', ticketData.qauntity);
+            data.append('expireDate', ticketData.expiredate);
+
+            var Api = Connections.api + Connections.AddTicket;
+
+            fetch(Api, {
+                method: 'POST',
+                body: data
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        handleDialogClose();
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                    }
+                })
+                .catch((error) => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: error.message
+                    });
+                });
+        }
+    };
+
     useEffect(() => {
         GetTickets();
+
         return () => {};
     }, []);
 
@@ -211,6 +265,7 @@ const Tickets = () => {
                     density="comfortable"
                     hideFooterSelectedRowCount={true}
                     sx={{ padding: 1, marginTop: 1.6 }}
+                    onRowClick={(params) => navigate('/ticket-detail', { state: { ...params.row } })}
                 />
             </Grid>
 
@@ -232,72 +287,75 @@ const Tickets = () => {
                         </IconButton>
                     </Box>
 
-                    <DialogContent sx={{ textAlign: 'center' }}>
-                        <Grid item xs={12} sx={{ marginTop: 1 }}>
-                            <Autocomplete
-                                freeSolo
-                                options={events}
-                                getOptionLabel={(option) => option.event_name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        setTicketData({
-                                            event_id: value.id,
-                                            event_image: value.event_image,
-                                            event_name: value.event_name
-                                        });
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} required label="Event" variant="outlined" />}
-                            />
-                        </Grid>
+                    <form onSubmit={handleAddTicket}>
+                        <DialogContent sx={{ textAlign: 'center' }}>
+                            <Grid item xs={12} sx={{ marginTop: 1 }}>
+                                <Autocomplete
+                                    freeSolo
+                                    options={events}
+                                    getOptionLabel={(option) => option.event_name}
+                                    onChange={(event, value) => {
+                                        if (value) {
+                                            setTicketData({
+                                                event_id: value.id,
+                                                event_image: value.event_image,
+                                                event_name: value.event_name
+                                            });
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} required label="Event" variant="outlined" />}
+                                />
+                            </Grid>
 
-                        <Grid item sx={{ paddingY: 2, display: 'flex', justifyContent: 'center' }}>
-                            <FormControl required sx={{ minWidth: 250 }}>
-                                <Select value={ttype} onChange={handleTicketTypeChange}>
-                                    <MenuItem value="Ticket Type">Ticket Type</MenuItem>
-                                    {TicketType.map((ticket) => (
-                                        <MenuItem key={ticket.id} value={ticket.name}>
-                                            {ticket.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Grid item sx={{ paddingY: 2, display: 'flex', justifyContent: 'center' }}>
+                                <FormControl required sx={{ minWidth: 250 }}>
+                                    <Select value={ticketData.tickettype} onChange={handleTicketTypeChange}>
+                                        <MenuItem value="Ticket Type">Ticket Type</MenuItem>
+                                        {TicketType.map((ticket) => (
+                                            <MenuItem key={ticket.id} value={ticket.name}>
+                                                {ticket.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
-                            <TextField
-                                placeholder="Ticket Price"
-                                value={ticketData.price}
-                                onChange={(event) => setTicketData({ ...ticketData, price: event.target.value })}
-                                sx={{ marginLeft: 4, minWidth: 250 }}
-                            />
-                        </Grid>
+                                <TextField
+                                    placeholder="Ticket Price"
+                                    required
+                                    value={ticketData.price}
+                                    onChange={(event) => setTicketData({ ...ticketData, price: event.target.value })}
+                                    sx={{ marginLeft: 4, minWidth: 250 }}
+                                />
+                            </Grid>
 
-                        <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <TextField
-                                required
-                                placeholder="Quantity"
-                                value={ticketData.qauntity}
-                                onChange={(event) => setTicketData({ ...ticketData, qauntity: event.target.value })}
-                                sx={{ minWidth: 250 }}
-                            />
+                            <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <TextField
+                                    required
+                                    placeholder="Quantity"
+                                    value={ticketData.qauntity}
+                                    onChange={(event) => setTicketData({ ...ticketData, qauntity: event.target.value })}
+                                    sx={{ minWidth: 250 }}
+                                />
 
-                            <TextField
-                                required
-                                type="date"
-                                placeholder="Expire Date"
-                                value={ticketData.expiredate}
-                                onChange={(event) => setTicketData({ ...ticketData, expiredate: event.target.value })}
-                                sx={{ marginLeft: 4, minWidth: 250 }}
-                            />
-                        </Grid>
-                    </DialogContent>
-                    <DialogActions sx={{ paddingRight: 4, paddingY: 3 }}>
-                        <Button variant="text" color="dark" onClick={handleDialogClose}>
-                            Cancel
-                        </Button>
-                        <Button variant="contained" color="warning" onClick={() => Delete(event.id)}>
-                            {spinner ? <CircularProgress size={18} /> : 'Add '}
-                        </Button>
-                    </DialogActions>
+                                <TextField
+                                    required
+                                    type="date"
+                                    placeholder="Expire Date"
+                                    value={ticketData.expiredate}
+                                    onChange={(event) => setTicketData({ ...ticketData, expiredate: event.target.value })}
+                                    sx={{ marginLeft: 4, minWidth: 250 }}
+                                />
+                            </Grid>
+                        </DialogContent>
+                        <DialogActions sx={{ paddingRight: 4, paddingY: 3 }}>
+                            <Button variant="text" color="dark" onClick={handleDialogClose}>
+                                Cancel
+                            </Button>
+                            <Button variant="contained" color="warning" type="submit">
+                                {spinner ? <CircularProgress size={18} /> : 'Add '}
+                            </Button>
+                        </DialogActions>
+                    </form>
                 </Box>
             </Dialog>
 
