@@ -359,3 +359,33 @@ export function EventStatus(status) {
 
     return { literalStatus, statusColor };
 }
+
+export function TicketStatus(status) {
+    var numericStatus = parseInt(status);
+    var literalStatus;
+    var statusColor;
+    switch (numericStatus) {
+        case 0:
+            literalStatus = 'Pending';
+            statusColor = '#808080';
+            break;
+        case 1:
+            literalStatus = 'Active';
+            statusColor = '#00aa00';
+            break;
+        case 2:
+            literalStatus = 'Sold out';
+            statusColor = '#808080';
+            break;
+        case 3:
+            literalStatus = 'Declined';
+            statusColor = '#aa0000';
+            break;
+        default:
+            literalStatus = 'Pending';
+            statusColor = '#808080';
+            break;
+    }
+
+    return { literalStatus, statusColor };
+}

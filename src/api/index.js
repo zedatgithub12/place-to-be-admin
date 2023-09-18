@@ -38,6 +38,9 @@ const Connections = {
     search: 'search-event',
     YourEvents: 'your-events/',
 
+    //ticker related Endpoints
+    changeTicketStatus: 'change-ticket-status/',
+
     follow: 'follow',
     followers: 'followers/',
     following: 'following/',
@@ -76,7 +79,7 @@ const Connections = {
     createReservation: 'create-reservation',
     Tickets: 'tickets',
     FeaturedEvent: 'featured-event',
-    boughtTickets: 'soldticket/',
+    soldTickets: 'soldticket/',
     singleTicket: 'single-ticket/',
 
     //refunding related api's

@@ -274,7 +274,7 @@ const EventDetail = () => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error updating stock status!'
+                    message: 'There is error updating event status!'
                 });
             });
     };

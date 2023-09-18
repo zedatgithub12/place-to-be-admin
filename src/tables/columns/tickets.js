@@ -13,7 +13,7 @@ export const TicketColumns = [
     {
         field: 'tickettype',
         headerName: 'Ticket Type',
-        width: 120
+        width: 160
     },
     {
         field: 'currentprice',
@@ -23,7 +23,7 @@ export const TicketColumns = [
     {
         field: 'origionalamount',
         headerName: 'Total Quantity',
-        width: 120
+        width: 160
     },
     {
         field: 'currentamount',
@@ -37,7 +37,7 @@ export const TicketColumns = [
             const formattedDate = DateFormater(params.value);
             return formattedDate;
         },
-        width: 120
+        width: 160
     },
     {
         field: 'expiredate',
@@ -46,7 +46,7 @@ export const TicketColumns = [
             const formattedDate = DateFormater(params.value);
             return formattedDate;
         },
-        width: 120
+        width: 160
     },
     {
         field: 'status',
@@ -63,6 +63,6 @@ export const TicketColumns = [
                 return 'Pending';
             }
         },
-        width: 100
+        width: 160
     }
 ];

@@ -227,7 +227,6 @@ const Tickets = () => {
                     padding: 2
                 }}
             >
-                <SplitButton />
                 <DataGrid
                     autoHeight
                     autoWidth

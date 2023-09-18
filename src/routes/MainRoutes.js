@@ -129,6 +129,7 @@ const MainRoutes = {
             path: 'ticket-detail',
             element: <TicketDetail />
         },
+
         {
             path: 'audience',
             element: <Audience />
