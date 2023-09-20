@@ -18,6 +18,13 @@ const Connections = {
     updateUserInfo: 'update/',
     ChangePassword: 'changepassword',
 
+    // ads related endpoints
+    ads: 'ads',
+    createdAds: 'create-ads',
+    singleAd: 'single-ads/',
+    updateAds: 'update-ads/',
+    deleteAds: 'delete-ads/',
+
     //user related endpoints
     users: 'users',
 

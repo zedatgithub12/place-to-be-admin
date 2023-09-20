@@ -101,7 +101,7 @@ const Audience = () => {
             <Grid container style={{ paddingTop: '1 rem' }}>
                 <Grid container>
                     <Grid style={{ paddingLeft: '0.5rem', paddingBottom: '0.5rem' }} item xs={6}>
-                        <Typography variant="h2">Event Audience</Typography>
+                        <Typography variant="h3">Event Audience</Typography>
                     </Grid>
                     <Grid item xs={6} style={{ textAlign: 'right' }}>
                         <Button variant="text" onClick={() => GoBack()}>

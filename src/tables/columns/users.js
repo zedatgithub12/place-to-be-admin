@@ -4,45 +4,53 @@ export const columns = [
     { field: 'id', headerName: 'ID', width: 90 },
     {
         field: 'google_Id',
-        headerName: 'Google ID'
+        headerName: 'Google ID',
+        width: 160
     },
     {
         field: 'first_name',
         headerName: 'First Name',
-        type: 'name'
+        type: 'name',
+        width: 140
     },
     {
         field: 'middle_name',
         headerName: 'Middle Name',
-        type: 'name'
+        type: 'name',
+        width: 140
     },
     {
         field: 'username',
         headerName: 'Username',
-        type: 'name'
+        type: 'name',
+        width: 140
     },
     {
         field: 'email',
         headerName: 'Email',
         type: 'email',
-        sortable: true
+        sortable: true,
+        width: 240
     },
     {
         field: 'gender',
         headerName: 'Gender',
         type: 'gender',
-        sortable: true
+        sortable: true,
+        width: 160
     },
     {
         field: 'category',
         headerName: 'Category',
-        sortable: true
+        sortable: true,
+        width: 160
     },
     {
         field: 'phone',
         headerName: 'Phone',
         type: 'phone',
-        sortable: true
+        sortable: true,
+        width: 160
     },
     {
         field: 'created_at',
@@ -50,7 +58,8 @@ export const columns = [
         valueFormatter: (params) => {
             const formattedDate = DateFormater(params.value);
             return formattedDate;
-        }
+        },
+        width: 160
     },
     {
         field: 'status',
@@ -62,6 +71,7 @@ export const columns = [
             } else {
                 return 'Inactive';
             }
-        }
+        },
+        width: 90
     }
 ];

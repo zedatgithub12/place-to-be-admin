@@ -11,6 +11,10 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')))
 //ticket routing
 const Tickets = Loadable(lazy(() => import('views/tickets')));
 const TicketDetail = Loadable(lazy(() => import('views/tickets/ticket-detail')));
+
+//Ads routing
+const AdsPage = Loadable(lazy(() => import('views/ads-page')));
+const CreateAds = Loadable(lazy(() => import('views/create-ads')));
 // utilities routing
 const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
 const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
@@ -128,6 +132,14 @@ const MainRoutes = {
         {
             path: 'ticket-detail',
             element: <TicketDetail />
+        },
+        {
+            path: 'ads',
+            element: <AdsPage />
+        },
+        {
+            path: 'create-ads',
+            element: <CreateAds />
         },
 
         {

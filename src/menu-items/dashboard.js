@@ -66,7 +66,7 @@ const dashboard = {
             id: 'ads',
             title: 'Ads Management',
             type: 'item',
-            url: '/sample-page',
+            url: '/ads',
             icon: icons.IconSpeakerphone,
             breadcrumbs: false
         },
