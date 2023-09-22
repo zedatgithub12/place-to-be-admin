@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
 import { Grid, Box, TextField, Typography, Accordion, AccordionSummary, AccordionDetails, Input, InputAdornment } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import { Button } from '@mui/material';
 import { IconUpload, IconChevronDown } from '@tabler/icons';
-import AddIcon from '@mui/icons-material/Add';
 import { FormControl, Select, MenuItem, IconButton, InputLabel } from '@mui/material';
 import Connections from 'api';
 import Card from '@mui/material/Card';
@@ -17,34 +18,56 @@ import { AdsUrlLabel } from 'data/AdsUrlLabel';
 import LinearProgress from '@mui/material/LinearProgress';
 import { ArrowBack } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const CreateAds = () => {
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const UpdateAds = () => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const { state } = useLocation();
+
     const initialFormData = {
         owner: 1,
-        type: '',
-        creative: null,
-        heading: '',
-        subheading: '',
-        description: '',
-        linkLabel: '',
-        link: '',
-        budget: '',
-        frequency: '',
-        startdate: '',
-        enddate: '',
-        status: ''
+        type: state.ad_type ? state.ad_type : '',
+        creative: state.ad_creative ? state.ad_creative : null,
+        heading: state.ad_heading ? state.ad_heading : '',
+        subheading: state.ad_sub_heading ? state.ad_sub_heading : '',
+        description: state.ad_description ? state.ad_description : '',
+        linkLabel: state.ad_button_label ? state.ad_button_label : '',
+        link: state.ad_link_url ? state.ad_link_url : '',
+        budget: state.ad_budget ? state.ad_budget : '',
+        frequency: state.ad_frequency ? state.ad_frequency : '',
+        startdate: state.ad_start_date ? state.ad_start_date : '',
+        enddate: state.ad_end_date ? state.ad_end_date : '',
+        status: state.ad_status ? state.ad_status : ''
     };
     const [formData, setFormData] = useState(initialFormData);
     const [activeAccordion, setActiveAccordion] = useState(0);
-    const [adType, setAdType] = useState();
+    const [adType, setAdType] = useState(state.ad_type ? state.ad_type : '');
     const [uploading, setUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const [uploadError, setUploadError] = useState(false);
     const [creativePreview, setCreativePreview] = useState(null);
-    const [linkLabel, setLinkLabel] = useState();
+    const [linkLabel, setLinkLabel] = useState(state.ad_button_label ? state.ad_button_label : '');
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -96,11 +119,10 @@ const CreateAds = () => {
 
     //---------------------Submit-----------------------
     const handleSubmit = () => {
-        var APIUrl = Connections.api + Connections.createdAds;
+        var APIUrl = Connections.api + Connections.updateAds + state.id;
 
         const data = new FormData();
 
-        data.append('ad_type', adType);
         data.append('ad_creative', formData.creative);
         data.append('ad_heading', formData.heading);
         data.append('ad_sub_heading', formData.subheading);
@@ -112,7 +134,6 @@ const CreateAds = () => {
         data.append('ad_frequency', formData.frequency);
         data.append('ad_start_date', formData.startdate);
         data.append('ad_end_date', formData.enddate);
-        data.append('ad_owner_id', 2);
 
         fetch(APIUrl, {
             method: 'POST',
@@ -120,17 +141,29 @@ const CreateAds = () => {
         })
             .then((response) => response.json())
             .then((response) => {
-                console.log(response);
                 if (response.success) {
-                    alert(response.message);
-                    console.log(response.message);
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
                 } else {
-                    console.log(response.message);
-                    alert('Unable to Add');
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
                 }
             })
             .catch((error) => {
-                console.error(error);
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: error.message
+                });
             });
     };
 
@@ -165,15 +198,14 @@ const CreateAds = () => {
                 <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <IconButton
-                            onClick={() => navigate('/')}
-                            color="secondary"
+                            onClick={() => navigate(-1)}
                             aria-label="back"
                             sx={{ background: theme.palette.background.default, color: theme.palette.grey[800] }}
                         >
                             <ArrowBack />
                         </IconButton>
                         <Typography variant="h4" style={{ marginTop: 24, marginBottom: 16, marginLeft: 20 }}>
-                            Create Ads
+                            Update Ad
                         </Typography>
                     </div>
                 </Grid>
@@ -183,20 +215,9 @@ const CreateAds = () => {
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Typography sx={{ fontWeight: 'bold', fontSize: 20 }}>Ad</Typography>
 
-                            <FormControl variant="standard" fullWidth margin="dense" sx={{ width: '150px', borderRadius: 0 }} size="small">
-                                <InputLabel id="dropdown-label">Ad's Type</InputLabel>
-                                <Select
-                                    labelId="dropdown-label"
-                                    id="dropdown"
-                                    value={adType}
-                                    onChange={handleTypeSelection}
-                                    label="Select Ad's Type"
-                                >
-                                    {AdTypes.map((type) => (
-                                        <MenuItem value={type.name}>{type.name}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Typography sx={{ textTransform: 'capitalize' }} variant="h5">
+                                {adType}
+                            </Typography>
                         </div>
                         {/*------------------- creatives ----------------------*/}
                         <Accordion defaultExpanded expanded={activeAccordion === 0} onChange={() => setActiveAccordion(0)}>
@@ -321,7 +342,7 @@ const CreateAds = () => {
                                                             ))}
                                                         </Select>
                                                     </FormControl>
-                                                    <IconButton
+                                                    {/* <IconButton
                                                         color="primary"
                                                         sx={{
                                                             alignItems: 'center',
@@ -334,7 +355,7 @@ const CreateAds = () => {
                                                         }}
                                                     >
                                                         <AddIcon />
-                                                    </IconButton>
+                                                    </IconButton> */}
                                                 </Box>
                                             </Grid>
 
@@ -347,6 +368,7 @@ const CreateAds = () => {
                                                     name="link"
                                                     onChange={handleInputChange}
                                                     value={formData.link}
+                                                    sx={{ marginTop: 1 }}
                                                 />
                                             </Grid>
 
@@ -455,15 +477,27 @@ const CreateAds = () => {
 
                 <Grid item xl={7.5} lg={7.5} md={7.5} sm={12} xs={12} sx={{ marginTop: 3 }}>
                     <Box padding={2} sx={{ background: 'white', marginLeft: 3, marginRight: 3 }}>
-                        <PreviewEvent formData={formData} creativePreview={creativePreview} linkLabel={linkLabel} />
+                        <PreviewEvent
+                            formData={formData}
+                            creativePreview={creativePreview}
+                            linkLabel={linkLabel}
+                            existingCreative={state.ad_creative}
+                        />
                     </Box>
                 </Grid>
             </Grid>
+
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
 //------------------ Preview --------------------
-const PreviewEvent = ({ formData, creativePreview, linkLabel }) => {
+const PreviewEvent = ({ formData, creativePreview, linkLabel, existingCreative }) => {
+    var featuredImageUri = Connections.api + Connections.assets;
     return (
         <Box
             sx={{
@@ -473,7 +507,13 @@ const PreviewEvent = ({ formData, creativePreview, linkLabel }) => {
         >
             <Card sx={{}}>
                 <CardActionArea>
-                    <CardMedia component="img" width="140" height="140" image={creativePreview} alt="green iguana" />
+                    <CardMedia
+                        component="img"
+                        width="400"
+                        height="400"
+                        image={creativePreview ? creativePreview : featuredImageUri + existingCreative}
+                        alt="Ad Preview"
+                    />
                     <CardContent>
                         <Typography gutterBottom variant="h3" component="div">
                             {formData.heading}
@@ -495,4 +535,4 @@ const PreviewEvent = ({ formData, creativePreview, linkLabel }) => {
         </Box>
     );
 };
-export default CreateAds;
+export default UpdateAds;

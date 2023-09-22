@@ -74,7 +74,7 @@ const dashboard = {
             id: 'notification',
             title: 'Notifications',
             type: 'item',
-            url: '/sample-page',
+            url: '/notifications',
             icon: icons.IconNotification,
             breadcrumbs: false
         },

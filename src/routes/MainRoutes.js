@@ -14,7 +14,13 @@ const TicketDetail = Loadable(lazy(() => import('views/tickets/ticket-detail')))
 
 //Ads routing
 const AdsPage = Loadable(lazy(() => import('views/ads-page')));
-const CreateAds = Loadable(lazy(() => import('views/create-ads')));
+const CreateAds = Loadable(lazy(() => import('views/ads-page/create-ads')));
+const UpdateAds = Loadable(lazy(() => import('views/ads-page/update-ads')));
+const AdsDetail = Loadable(lazy(() => import('views/ads-page/ads-detail')));
+
+//Notification
+const Notification = Loadable(lazy(() => import('views/notifications')));
+
 // utilities routing
 const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
 const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
@@ -141,7 +147,18 @@ const MainRoutes = {
             path: 'create-ads',
             element: <CreateAds />
         },
-
+        {
+            path: 'ads-detail',
+            element: <AdsDetail />
+        },
+        {
+            path: 'update-ads',
+            element: <UpdateAds />
+        },
+        {
+            path: 'notifications',
+            element: <Notification />
+        },
         {
             path: 'audience',
             element: <Audience />

@@ -22,9 +22,10 @@ const Connections = {
     ads: 'ads',
     createdAds: 'create-ads',
     singleAd: 'single-ads/',
+    adstats: 'ad-stats/',
     updateAds: 'update-ads/',
     deleteAds: 'delete-ads/',
-
+    changeAdStatus: 'change-ad-status/',
     //user related endpoints
     users: 'users',
 
@@ -58,7 +59,7 @@ const Connections = {
     organizer: 'organizer', //updated
     singleBusiness: 'singleBusiness',
 
-    notification: 'notification',
+    notification: 'notifications',
     getNotification: 'fetchNotifications/',
     notified: 'notified-users',
 

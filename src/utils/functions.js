@@ -1,3 +1,5 @@
+import { useTheme } from '@mui/material';
+
 export const ArrivalTime = () => {
     const d = new Date();
     let hour = d.getHours();
@@ -389,3 +391,39 @@ export function TicketStatus(status) {
 
     return { literalStatus, statusColor };
 }
+
+export const AdsStatuses = (currentStatus) => {
+    const theme = useTheme();
+    var color;
+
+    switch (currentStatus) {
+        case 'draft':
+            color = theme.palette.warning.dark;
+            break;
+        case 'Draft':
+            color = theme.palette.warning.dark;
+            break;
+        case 'Pending':
+            color = theme.palette.grey[400];
+            break;
+        case 'Active':
+            color = theme.palette.success.dark;
+            break;
+        case 'Done':
+            color = theme.palette.primary.dark;
+            break;
+        case 'Paused':
+            color = theme.palette.grey[400];
+            break;
+        case 'Declined':
+            color = theme.palette.error.dark;
+            break;
+        case 'Cancelled':
+            color = theme.palette.error.dark;
+            break;
+        default:
+            color = theme.palette.grey[400];
+            break;
+    }
+    return color;
+};
