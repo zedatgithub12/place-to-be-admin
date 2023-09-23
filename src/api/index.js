@@ -60,6 +60,7 @@ const Connections = {
     singleBusiness: 'singleBusiness',
 
     notification: 'notifications',
+    sendAlert: 'send-alert',
     getNotification: 'fetchNotifications/',
     notified: 'notified-users',
 
