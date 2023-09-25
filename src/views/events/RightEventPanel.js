@@ -32,6 +32,7 @@ import { useTheme } from '@mui/material';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import './eventStyle.css';
+import { DateFormater } from 'utils/functions';
 
 const RightEventPanel = ({ events }) => {
     const theme = useTheme();
@@ -44,14 +45,14 @@ const RightEventPanel = ({ events }) => {
     };
 
     const filterEvents = (tab) => {
-        tabCounters.featured = events.filter((event) => event.event_status === 'featured').length;
+        tabCounters.featured = events.filter((event) => event.event_status == 0).length;
         switch (tab) {
-            case 'featured':
-                return events.filter((event) => event.event_status === 'featured');
-            case 'declined':
-                return events.filter((event) => event.event_status === 'declined');
+            case 'Pending':
+                return events.filter((event) => event.event_status == 0);
+            case 'Declined':
+                return events.filter((event) => event.event_status == 2);
             default:
-                return events;
+                return events.filter((event) => event.event_status == 0);
         }
     };
 
@@ -89,8 +90,8 @@ const RightEventPanel = ({ events }) => {
                     onChange={handleTabChange}
                 >
                     <Tab
-                        value="featured"
-                        label="Featured"
+                        value="Pending"
+                        label="Pending"
                         icon={
                             <Box
                                 sx={{
@@ -110,7 +111,7 @@ const RightEventPanel = ({ events }) => {
                         }
                         iconPosition="end"
                     />
-                    <Tab value="declined" label="Declined" />
+                    <Tab value="Declined" label="Declined" />
                 </Tabs>
             </Box>
 
@@ -120,8 +121,8 @@ const RightEventPanel = ({ events }) => {
                         <TableHead>
                             <TableRow>
                                 <TableCell>Event Name</TableCell>
+                                <TableCell>Organizer</TableCell>
                                 <TableCell align="center">Added Date</TableCell>
-                                <TableCell align="right">Action</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -134,21 +135,10 @@ const RightEventPanel = ({ events }) => {
                                     <TableCell component="th" scope="row">
                                         {event.event_name}
                                     </TableCell>
-                                    <TableCell align="center">{event.added_date}</TableCell>
-                                    <TableCell align="right">
-                                        <Box sx={{ minWidth: 100 }}>
-                                            <FormControl fullWidth size="small">
-                                                <InputLabel fontSize={theme.typography.button} sx={{ color: 'white' }}>
-                                                    Preview
-                                                </InputLabel>
-                                                <Select className="custom-select" label="Age" variant="outlined">
-                                                    <MenuItem value={10}>Ten</MenuItem>
-                                                    <MenuItem value={20}>Twenty</MenuItem>
-                                                    <MenuItem value={30}>Thirty</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                        </Box>
+                                    <TableCell component="th" scope="row">
+                                        {event.event_organizer}
                                     </TableCell>
+                                    <TableCell align="center">{DateFormater(event.addedDate)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

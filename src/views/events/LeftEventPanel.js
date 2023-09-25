@@ -1,23 +1,15 @@
 // material-ui
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useTheme } from '@mui/material/styles';
 import {
-    Typography,
     Grid,
     Paper,
-    IconButton,
-    InputBase,
-    Divider,
-    InputLabel,
-    FormControl,
-    Select,
-    MenuItem,
+    Typography,
     Box,
-    Badge,
     Tabs,
     Tab,
-    makeStyles,
-    Card
-} from '@mui/material';
-import {
+    Card,
     Table,
     TableBody,
     TableHead,
@@ -25,17 +17,15 @@ import {
     TableContainer,
     TableRow,
     TablePagination,
-    NativeSelect,
     TableFooter
 } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useTheme } from '@mui/material/styles';
+
 import { MoreVert } from '@mui/icons-material';
-
+import { P2bProgress } from 'utils/spinners';
 import './eventStyle.css';
+import { EventStatus } from 'utils/functions';
 
-const LeftEventPanel = ({ events }) => {
+const LeftEventPanel = ({ events, isLoading }) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const [page, setPage] = useState(0); //for pagination
@@ -211,36 +201,47 @@ const LeftEventPanel = ({ events }) => {
                                 <TableCell align="right">Type</TableCell>
                                 <TableCell align="right">Start Date</TableCell>
                                 <TableCell align="right">End Date</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell align="right">Status</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {visibleRows.map((event) => (
-                                <TableRow
-                                    key={event.id}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
-                                    onClick={() => navigate('/event-detail', { state: { ...event } })}
-                                >
-                                    <TableCell component="th" scope="row">
-                                        {event.event_name}
-                                    </TableCell>
-                                    <TableCell align="right">{event.event_organizer}</TableCell>
-                                    <TableCell align="right">{event.event_type}</TableCell>
-                                    <TableCell align="right">{event.start_date}</TableCell>
-                                    <TableCell align="right">{event.end_date}</TableCell>
-                                    <TableCell align="right">
-                                        <IconButton
-                                            aria-label="more"
-                                            id="long-button"
-                                            aria-controls={open ? 'long-menu' : undefined}
-                                            aria-expanded={open ? 'true' : undefined}
-                                            aria-haspopup="true"
-                                        >
-                                            <MoreVert />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                            {isLoading ? (
+                                <P2bProgress />
+                            ) : (
+                                visibleRows.map((event) => (
+                                    <TableRow
+                                        key={event.id}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                                        onClick={() => navigate('/event-detail', { state: { ...event } })}
+                                    >
+                                        <TableCell component="th" scope="row">
+                                            {event.event_name}
+                                        </TableCell>
+                                        <TableCell align="right">{event.event_organizer}</TableCell>
+                                        <TableCell align="right">
+                                            {event.event_type === 'free' ? (
+                                                <Typography className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded text-capitalize">
+                                                    {event.event_type}
+                                                </Typography>
+                                            ) : (
+                                                <Typography className="bg-warning bg-opacity-10 text-warning px-2 py-1 rounded text-capitalize">
+                                                    {event.event_type}
+                                                </Typography>
+                                            )}
+                                        </TableCell>
+                                        <TableCell align="right">{event.start_date}</TableCell>
+                                        <TableCell align="right">{event.end_date}</TableCell>
+                                        <TableCell align="right">
+                                            <Typography
+                                                fontWeight={theme.typography.fontWeightBold}
+                                                sx={{ color: EventStatus(event.event_status).statusColor }}
+                                            >
+                                                {EventStatus(event.event_status).literalStatus}
+                                            </Typography>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>

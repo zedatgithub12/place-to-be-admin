@@ -10,6 +10,7 @@ const tabData = [
         price: 500,
         sold: 20,
         date: '2023-08-15',
+        time: '12:00',
         status: 'sold out',
         p_gateway: 'Stripe',
         transactionId: 'TRANS002',
@@ -29,6 +30,7 @@ const tabData = [
         price: 250,
         sold: 150,
         date: '2023-09-05',
+        time: '12:00',
         status: 'active',
         p_gateway: 'PayPal',
         transactionId: 'TRANS003',
@@ -48,6 +50,7 @@ const tabData = [
         price: 300,
         sold: 80,
         date: '2023-08-15',
+        time: '12:00',
         status: 'active',
         p_gateway: 'Stripe',
         transactionId: 'TRANS004',
@@ -67,6 +70,7 @@ const tabData = [
         price: 150,
         sold: 40,
         date: '2023-08-20',
+        time: '12:00',
         status: 'active',
         p_gateway: 'Stripe',
         transactionId: 'TRANS005',
@@ -86,6 +90,7 @@ const tabData = [
         price: 100,
         sold: 120,
         date: '2023-08-25',
+        time: '12:00',
         status: 'pending',
         p_gateway: 'PayPal',
         transactionId: 'TRANS006',
@@ -97,3 +102,73 @@ const tabData = [
 ];
 
 export default tabData;
+
+export const TicketType = [
+    {
+        id: '1',
+        name: 'Early Bird',
+        icon: 'bird'
+    },
+    {
+        id: '2',
+        name: 'Regular',
+        icon: 'ticket'
+    },
+    {
+        id: '3',
+        name: 'VIP',
+        icon: 'star-outline'
+    },
+    {
+        id: '4',
+        name: 'VVIP',
+        icon: 'star-shooting-outline'
+    },
+    {
+        id: '5',
+        name: 'Student',
+        icon: 'book-education-outline'
+    },
+    {
+        id: '6',
+        name: 'Kids',
+        icon: 'baby-face-outline'
+    },
+    {
+        id: '7',
+        name: 'Adult',
+        icon: 'face-man'
+    },
+    {
+        id: '8',
+        name: 'Member',
+        icon: 'account-group-outline'
+    }
+];
+
+export const TicketStatuses = [
+    {
+        id: 1,
+        label: 'Approve',
+        value: 1,
+        color: '#00aa00'
+    },
+    {
+        id: 2,
+        label: 'Save as Draft',
+        value: 0,
+        color: '#808080'
+    },
+    {
+        id: 3,
+        label: 'Sold Out',
+        value: 2,
+        color: '#808080'
+    },
+    {
+        id: 4,
+        label: 'Declined',
+        value: 3,
+        color: '#aa0000'
+    }
+];
