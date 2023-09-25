@@ -1,136 +1,192 @@
 // CustomerPage.js
-import React, { useState } from 'react';
-import CustomerTable from '../../ui-component/customer-support/customerTable';
-import customersdata from 'data/customer';
-import { Grid, Paper, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Grid, Box, Paper, Typography, useTheme } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import { SupportColumns } from 'tables/columns/customer_support';
+import Connections from 'api';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CustomerModal from 'ui-component/customer-support/customerModal';
 
-const columns = [
-    { id: 'id', label: 'Id', align: 'left' },
-    { id: 'name', label: 'Name', align: 'left' },
-    {
-        id: 'email',
-        label: 'Email',
-        align: 'left'
-    },
-    {
-        id: 'message',
-        label: 'Message',
-        align: 'left'
-    },
-    {
-        id: 'date',
-        label: 'Date',
-        align: 'left'
-    },
-    {
-        id: 'status',
-        label: 'status',
-        align: 'center'
-    }
-];
-
 const CustomerPage = () => {
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const rows = customersdata;
+    const theme = useTheme();
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
+    const [data, setData] = useState([]);
+    const [lastPage, setLastPage] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [rowCountState, setRowCountState] = useState(lastPage);
+    const [paginationModel, setPaginationModel] = useState({
+        pageSize: 25,
+        page: 0,
+        pageCount: 10,
+        pageStartIndex: 0,
+        pageEndIndex: 0
+    });
 
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
-
-    const countNewStatus = rows.filter((row) => row.status === 'new').length;
-    const countAnsweredStatus = rows.filter((row) => row.status === 'answered').length;
+    const countNewStatus = data.filter((row) => row.status === 0).length;
+    const countAnsweredStatus = data.filter((row) => row.status === 1).length;
 
     const [selectedRow, setSelectedRow] = useState(null);
+
+    const GetQueries = () => {
+        var Api = Connections.api + Connections.queries + `?page=${paginationModel.page}&limit=${paginationModel.pageSize}`;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        fetch(Api, {
+            method: 'get',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setData(response.data.data);
+                    setLastPage(response.data.last_page);
+                    setLoading(false);
+                }
+            })
+            .catch((error) => {
+                setLoading(false);
+            });
+    };
+
+    useEffect(() => {
+        GetQueries();
+        return () => {};
+    }, []);
+
     return (
         <Grid container>
             <Grid item md={8}>
-                <div>
-                    <Typography variant="h2" m={4} mt={2} ml={0}>
-                        {' '}
-                        Customer Support
-                    </Typography>
-                    <CustomerTable
-                        columns={columns}
-                        rows={rows}
-                        page={page}
-                        rowsPerPage={rowsPerPage}
-                        handleChangePage={handleChangePage}
-                        handleChangeRowsPerPage={handleChangeRowsPerPage}
-                        setSelectedRow={setSelectedRow}
-                    />
-                </div>
+                <Typography variant="h3" m={4} mt={2} ml={0}>
+                    {' '}
+                    Customer Support
+                </Typography>
+
+                <Grid
+                    container
+                    sx={{
+                        flexDirection: 'column',
+                        alignItems: 'start',
+                        justifyContent: 'flex-start',
+                        bgcolor: theme.palette.background.default,
+                        borderRadius: 4,
+                        marginTop: 2,
+                        padding: 2
+                    }}
+                >
+                    <Grid item>
+                        <DataGrid
+                            autoHeight
+                            autoWidth
+                            columns={SupportColumns}
+                            rows={data}
+                            initialState={{
+                                pagination: {
+                                    paginationModel: {
+                                        pageSize: paginationModel.pageSize,
+                                        page: 1,
+                                        pageCount: lastPage,
+                                        pageStartIndex: paginationModel.page * paginationModel.pageSize,
+                                        pageEndIndex: lastPage
+                                    }
+                                }
+                            }}
+                            paginationModel={paginationModel}
+                            onPaginationModelChange={setPaginationModel}
+                            pagination={true}
+                            rowCount={rowCountState}
+                            pageSizeOptions={[10, 25, 50, 100]}
+                            onPageChange={(newPage) => {
+                                setPaginationModel({
+                                    ...paginationModel,
+                                    page: newPage
+                                });
+                            }}
+                            onPageSizeChange={(newPageSize) => {
+                                setPaginationModel({
+                                    ...paginationModel,
+                                    pageSize: newPageSize
+                                });
+                            }}
+                            paginationMode="server"
+                            density="comfortable"
+                            hideFooterSelectedRowCount={true}
+                            sx={{ padding: 1, marginTop: 1.6 }}
+                            onRowClick={(params) => setSelectedRow({ ...params.row })}
+                        />
+                    </Grid>
+                </Grid>
             </Grid>
-            <Grid item md={4} mt={7} p={3}>
+            <Grid item md={4} mt={7} p={3} pt={2}>
                 <Grid>
                     <Paper
                         sx={{
                             width: '100%',
-                            height: '50px',
-                            marginBottom: '5px',
-                            background: 'white',
+                            height: 'auto',
+                            marginBottom: 1,
+                            background: theme.palette.background.default,
                             overflow: 'hidden',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            paddingLeft: '15px',
-                            paddingRight: '10px'
+                            paddingLeft: 2,
+                            paddingRight: 3,
+                            paddingY: 2
                         }}
                     >
-                        <FormatQuoteIcon
-                            sx={{
-                                fontSize: 35,
-                                color: '#FD4016',
-                                borderRadius: '50%',
-                                padding: '5px',
-                                background: '#FFE4E4',
-                                transform: 'rotate(180deg)'
-                            }}
-                        />
-                        <Typography variant="h4"> New Queries </Typography>
-                        <Typography variant="h4" pl={5}>
-                            {' '}
-                            {countNewStatus}{' '}
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <FormatQuoteIcon
+                                sx={{
+                                    fontSize: 35,
+                                    color: theme.palette.error.dark,
+                                    borderRadius: '50%',
+                                    padding: '5px',
+                                    background: '#FFE4E4',
+                                    transform: 'rotate(180deg)',
+                                    marginRight: 2
+                                }}
+                            />
+                            <Typography variant="subtitle1"> New Queries </Typography>
+                        </Box>
+
+                        <Typography variant="h5" pl={5}>
+                            {countNewStatus}
                         </Typography>
-                        <ArrowForwardIosIcon sx={{ height: '15px', color: 'gray' }} />
                     </Paper>
                     <Paper
                         sx={{
                             width: '100%',
-                            height: '50px',
-                            background: 'white',
+                            height: 'auto',
+                            marginBottom: 1,
+                            background: theme.palette.background.default,
                             overflow: 'hidden',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            paddingLeft: '15px',
-                            paddingRight: '10px'
+                            paddingLeft: 2,
+                            paddingRight: 3,
+                            paddingY: 2
                         }}
                     >
-                        <FormatQuoteIcon
-                            sx={{
-                                fontSize: 35,
-                                color: '#009C10',
-                                borderRadius: '50%',
-                                padding: '5px',
-                                background: '#BFFFC6',
-                                transform: 'rotate(180deg)'
-                            }}
-                        />
-                        <Typography variant="h4"> Answered </Typography>
-                        <Typography variant="h4" pl={7}>
-                            {' '}
-                            {countAnsweredStatus}{' '}
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <FormatQuoteIcon
+                                sx={{
+                                    fontSize: 35,
+                                    color: '#009C10',
+                                    borderRadius: '50%',
+                                    padding: '5px',
+                                    background: '#BFFFC6',
+                                    transform: 'rotate(180deg)',
+                                    marginRight: 2
+                                }}
+                            />
+                            <Typography variant="subtitle1"> Answered </Typography>
+                        </Box>
+                        <Typography variant="h5" pl={7}>
+                            {countAnsweredStatus}
                         </Typography>
-                        <ArrowForwardIosIcon sx={{ height: '15px', color: 'gray' }} />
                     </Paper>
                     <CustomerModal selectedRow={selectedRow} onClose={() => setSelectedRow(null)} />
                 </Grid>

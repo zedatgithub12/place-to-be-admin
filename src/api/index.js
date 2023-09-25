@@ -1,7 +1,7 @@
 const Connections = {
-    // api: 'http://192.168.100.3:8000/api/',
+    api: 'http://192.168.100.3:8000/api/',
     // url: 'http://192.168.100.3:8000/api/',
-    api: 'http://localhost:8000/api/',
+    // api: 'http://localhost:8000/api/',
     url: 'http://localhost:8000/api/',
     //admin dashboard end points
     adminsignin: 'adminsignin',
@@ -59,6 +59,7 @@ const Connections = {
     organizer: 'organizer', //updated
     singleBusiness: 'singleBusiness',
 
+    //notification end points
     notification: 'notifications',
     sendAlert: 'send-alert',
     getNotification: 'fetchNotifications/',
@@ -67,7 +68,7 @@ const Connections = {
     OrganizerFollowCounter: 'organizer-followers/',
     organizerEvents: 'organizer-event/',
     organizerUpcomings: 'organizer-upcoming-event/',
-    createfeedback: 'create-feedback',
+
     forgotPassword: 'forgotPassword',
     status: 'status', //*********** need pilot */
     Images: 'Images',
@@ -107,7 +108,11 @@ const Connections = {
 
     //tickets endpoints
     requestRefunding: 'ticket-refunds',
-    refundingInfo: 'ticket-refunds/'
+    refundingInfo: 'ticket-refunds/',
+
+    //customer support api end points
+    queries: 'feedback',
+    changeQueryStatus: 'update-query-status/'
 };
 
 export default Connections;

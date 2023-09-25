@@ -26,42 +26,6 @@ const Audience = () => {
         navigate(-1);
     };
 
-    useEffect(() => {
-        const getSoldItems = () => {
-            setLoading(true);
-            var Api = Connections.api + Connections.getSoldItem + `?page=${paginationModel.page}&limit=${paginationModel.pageSize}`;
-
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            // Make the API call using fetch()
-            fetch(Api, {
-                method: 'GET',
-                headers: headers,
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        var selectedShop = response.data.data > 0 ? response.data.data[1].shop : 'Shop';
-                        setFilterShop(selectedShop);
-                        setData(response.data.data);
-                        setLastPage(response.data.last_page);
-                        setLoading(false);
-                    } else {
-                        setData(data);
-                        setLoading(false);
-                    }
-                })
-                .catch(() => {
-                    setLoading(false);
-                });
-        };
-        getSoldItems();
-        return () => {};
-    }, [paginationModel]);
-
     const GetUsers = () => {
         var Api = Connections.api + Connections.users + `?page=${paginationModel.page}&limit=${paginationModel.pageSize}`;
         var headers = {
@@ -76,7 +40,8 @@ const Audience = () => {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    setData(response.data);
+                    setData(response.data.data);
+                    setLastPage(response.data.last_page);
                     setLoading(false);
                 }
             })
@@ -113,6 +78,7 @@ const Audience = () => {
 
                 <Grid container sx={{ bgcolor: theme.palette.background.default, borderRadius: 4 }}>
                     <DataGrid
+                        autoHeight
                         rows={data}
                         columns={columns}
                         initialState={{

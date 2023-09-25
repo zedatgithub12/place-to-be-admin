@@ -114,6 +114,7 @@ const Notifications = () => {
 
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
+
         setCreateNotification({ ...createNotification, image: file });
         const reader = new FileReader();
 

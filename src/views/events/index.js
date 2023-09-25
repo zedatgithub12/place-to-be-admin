@@ -34,9 +34,6 @@ const Events = () => {
     const handleSearchInputChange = (event) => {
         setSearchQuery(event.target.value);
     };
-    const handleSearchButtonClick = () => {
-        filterData();
-    };
 
     const handleOptionChange = (event, stateUpdater) => {
         stateUpdater(event.target.value);
@@ -69,7 +66,7 @@ const Events = () => {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    setFilteredEventsData(response.data);
+                    setFilteredEventsData(response.data.data);
                     setLoading(false);
                 }
             })

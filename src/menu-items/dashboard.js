@@ -56,10 +56,26 @@ const dashboard = {
         {
             id: 'tickets',
             title: 'Tickets',
-            type: 'item',
+            type: 'collapse',
             url: '/tickets',
             icon: icons.IconTicket,
-            breadcrumbs: false
+            breadcrumbs: false,
+            children: [
+                {
+                    id: 'tickets',
+                    title: 'All Tickets',
+                    type: 'item',
+                    url: '/tickets',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'soldtickects',
+                    title: 'Sold Tickets',
+                    type: 'item',
+                    url: '/sample-page',
+                    breadcrumbs: false
+                }
+            ]
         },
 
         {

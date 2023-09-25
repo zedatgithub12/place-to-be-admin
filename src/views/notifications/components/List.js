@@ -25,7 +25,7 @@ export const NotificationList = ({ title, type, date, handleClick, children, act
                 display: 'flex',
                 alignItems: 'center',
                 marginY: 2,
-                backgroundColor: active ? theme.palette.warning.light : 'white',
+                backgroundColor: active ? theme.palette.primary.light : 'white',
                 padding: '10px',
                 borderRadius: 8,
                 cursor: 'pointer',

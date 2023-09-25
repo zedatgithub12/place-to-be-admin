@@ -94,7 +94,7 @@ const Tickets = () => {
     };
 
     const GetTickets = () => {
-        var Api = Connections.api + Connections.Tickets;
+        var Api = Connections.api + Connections.Tickets + `?page=${paginationModel.page}&limit=${paginationModel.pageSize}`;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -107,7 +107,8 @@ const Tickets = () => {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    setData(response.data);
+                    setData(response.data.data);
+                    setLastPage(response.data.last_page);
                     setLoading(false);
                 }
             })
@@ -149,7 +150,7 @@ const Tickets = () => {
                 message: 'Please select ticket type'
             });
         } else {
-            var userInfo = await sessionStorage.getItem('user');
+            var userInfo = sessionStorage.getItem('user');
             var user = JSON.parse(userInfo);
 
             const data = new FormData();

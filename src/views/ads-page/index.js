@@ -26,7 +26,7 @@ const AdsPage = () => {
 
     useEffect(() => {
         const handelFetchAds = () => {
-            var APIUrl = Connections.api + Connections.ads;
+            var APIUrl = Connections.api + Connections.ads + `?page=${paginationModel.page}&limit=${paginationModel.pageSize}`;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ const AdsPage = () => {
                 .then((Response) => Response.json())
                 .then((Response) => {
                     if (Response.success) {
-                        setRows(Response.data);
+                        setRows(Response.data.data);
                     } else {
                         console.log(Response.message);
                     }
