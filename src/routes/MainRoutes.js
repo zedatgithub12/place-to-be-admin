@@ -107,6 +107,7 @@ const MainRoutes = {
             path: 'change-password',
             element: <ChangePassword />
         },
+
         {
             path: 'sample-page',
             element: <SamplePage />
