@@ -1,16 +1,10 @@
 import { useEffect, useState } from 'react';
 
 // material-ui
-import { Grid, Typography } from '@mui/material';
-
-// project imports
-import EarningCard from './EarningCard';
-import PopularCard from './PopularCard';
-import TotalOrderLineChartCard from './TotalOrderLineChartCard';
-import TotalIncomeDarkCard from './TotalIncomeDarkCard';
-import TotalIncomeLightCard from './TotalIncomeLightCard';
-import TotalGrowthBarChart from './TotalGrowthBarChart';
+import { Grid, Box, Typography } from '@mui/material';
 import { gridSpacing } from 'store/constant';
+import { P2bCard } from 'ui-component/cards/P2bCard';
+import { AdsInfo, EventsInfo, TicketInfo, supportInfo } from 'data/dashboard';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -23,7 +17,89 @@ const Dashboard = () => {
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
-                <Typography variant="h4">Place to be Admin Dashboard</Typography>
+                <Typography variant="h3">Admin Dashboard</Typography>
+
+                <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingTop: 4 }}>
+                    <Grid item xs={12} sm={5.8} md={3.9} lg={2.9} xl={2.9} mt={1}>
+                        <P2bCard title="Events">
+                            {EventsInfo.map((item, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        paddingY: 1.6
+                                    }}
+                                >
+                                    <Typography>{item.name}</Typography>
+                                    <Typography>{item.value}</Typography>
+                                </Box>
+                            ))}
+                        </P2bCard>
+                    </Grid>
+
+                    <Grid item xs={12} sm={5.8} md={3.9} lg={2.9} xl={2.9} mt={1}>
+                        <P2bCard title="Tickets">
+                            {TicketInfo.map((item, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        paddingY: 1.6
+                                    }}
+                                >
+                                    <Typography>{item.name}</Typography>
+                                    <Typography>{item.value}</Typography>
+                                </Box>
+                            ))}
+                        </P2bCard>
+                    </Grid>
+
+                    <Grid item xs={12} sm={5.8} md={3.9} lg={2.9} xl={2.9} mt={1}>
+                        <P2bCard title="Ads">
+                            {AdsInfo.map((item, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        paddingY: 1.6
+                                    }}
+                                >
+                                    <Typography>{item.name}</Typography>
+                                    <Typography>{item.value}</Typography>
+                                </Box>
+                            ))}
+                        </P2bCard>
+                    </Grid>
+
+                    <Grid item xs={12} sm={5.8} md={3.9} lg={2.9} xl={2.9} mt={1}>
+                        <P2bCard title="Customer Support">
+                            {supportInfo.map((item, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        paddingY: 1.6
+                                    }}
+                                >
+                                    <Typography>{item.name}</Typography>
+                                    <Typography>{item.value}</Typography>
+                                </Box>
+                            ))}
+                        </P2bCard>
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     );

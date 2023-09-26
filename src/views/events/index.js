@@ -83,8 +83,8 @@ const Events = () => {
     return (
         <Grid container display={'flex'} flexDirection={'column'}>
             <Grid item m={1} display={'flex'} justifyContent="space-between">
-                <Typography variant="h2">Events</Typography>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/add-event')}>
+                <Typography variant="h3">Events</Typography>
+                <Button variant="contained" color="warning" startIcon={<AddIcon />} onClick={() => navigate('/add-event')}>
                     Add Events
                 </Button>
             </Grid>
