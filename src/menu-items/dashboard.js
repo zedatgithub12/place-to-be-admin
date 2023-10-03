@@ -95,8 +95,8 @@ const dashboard = {
             breadcrumbs: false
         },
         {
-            id: 'users',
-            title: 'User',
+            id: 'customers',
+            title: 'Customers',
             type: 'item',
             url: '/audience',
             icon: icons.IconUsers,

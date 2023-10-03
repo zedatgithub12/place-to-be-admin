@@ -6,6 +6,9 @@ const Connections = {
     //admin dashboard end points
     adminsignin: 'adminsignin',
     changeEventStatus: 'change-event-status/',
+
+    //admin dashboard endpoints
+    admincards: 'admincards',
     // end users api end points
     signUp: 'signup',
     signIn: 'signin',
@@ -45,6 +48,9 @@ const Connections = {
     categoryFilter: 'search-category/',
     search: 'search-event',
     YourEvents: 'your-events/',
+
+    MakeEventFeatured: 'make-event-featured/',
+    MakeEventCancelled: 'make-event-cancelled/',
 
     //ticker related Endpoints
     changeTicketStatus: 'change-ticket-status/',

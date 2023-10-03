@@ -16,11 +16,5 @@ export const EventStatuses = [
         label: 'Declined',
         value: 2,
         color: '#aa0000'
-    },
-    {
-        id: 4,
-        label: 'Cancel Event',
-        value: 3,
-        color: '#808080'
     }
 ];
