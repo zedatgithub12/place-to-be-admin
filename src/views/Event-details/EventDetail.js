@@ -28,6 +28,7 @@ import Connections from 'api';
 import GoogleMapReact from 'google-map-react';
 
 import { MoreVert } from '@mui/icons-material';
+
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
     IconCalendarMinus,
@@ -38,13 +39,16 @@ import {
     IconCoins,
     IconLink,
     IconMapPin,
+    IconMoonStars,
     IconPhone,
+    IconStar,
     IconTags
 } from '@tabler/icons';
 import { DateFormater, EventStatus, TimeFormater } from 'utils/functions';
 import { EventStatuses } from 'data/eventStatus';
 import './eventStyle.css'; // styling to overriede mui
 import pin from 'assets/icons/marker.svg';
+import Loader from 'ui-component/Loader';
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -67,6 +71,10 @@ const EventDetail = () => {
 
     const [event, setEvent] = useState(state);
     const [statusOfEvent, setStatusOfEvent] = useState(state.event_status);
+    const [featured, setFeatured] = useState(state.priority);
+    const [featuring, setFeaturing] = useState(false);
+    const [cancelled, setCancelled] = useState(state.cancelled);
+    const [cancelling, setCancelling] = useState(false);
     const [coords, setCoords] = useState(true);
     const [organizer, setOrganizer] = useState([]);
     const [rating, setRating] = useState();
@@ -279,6 +287,114 @@ const EventDetail = () => {
             });
     };
 
+    //handle the status indicator state of featured event
+
+    const handleFeaturedIndicator = () => {
+        if (featured == 1) {
+            setFeatured(0);
+        } else {
+            setFeatured(1);
+        }
+    };
+
+    const handleCancelledIndicator = () => {
+        if (cancelled == 1) {
+            setFeatured(0);
+        } else {
+            setFeatured(1);
+        }
+    };
+    //The following function handles setting event featured
+    const handleEventFeaturing = (id) => {
+        setFeaturing(true);
+        var Api = Connections.api + Connections.MakeEventFeatured + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        fetch(Api, { method: 'PUT', headers: headers })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+
+                    setFeaturing(false);
+                    handleFeaturedIndicator();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+
+                    setFeaturing(false);
+                }
+            })
+            .catch((error) => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: error.message
+                });
+
+                setFeaturing(false);
+            });
+    };
+
+    //handle cancelling event
+    const handleCancelEvent = (id) => {
+        setCancelling(true);
+        var Api = Connections.api + Connections.MakeEventCancelled + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        fetch(Api, { method: 'PUT', headers: headers })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+
+                    setCancelling(false);
+                    handleCancelledIndicator();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+
+                    setCancelling(false);
+                }
+            })
+            .catch((error) => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: error.message
+                });
+
+                setCancelling(false);
+            });
+    };
+
+    //handle deleting event
     const Delete = () => {
         setSpinner(true);
         var Api = Connections.api + Connections.deleteEvent + event.id;
@@ -344,10 +460,7 @@ const EventDetail = () => {
                 m={1}
                 sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingX: 2.4 }}
             >
-                <Typography variant="h2">
-                    {event.event_name} {event.rating}
-                    <StarIcon sx={{ width: '12px', height: '12px', color: '#FFBB00' }} />{' '}
-                </Typography>
+                <Typography variant="h2">{event.event_name}</Typography>
                 <Button variant="text" size="small" sx={{ width: '100px' }} onClick={() => GoBack()}>
                     Back
                 </Button>
@@ -358,6 +471,7 @@ const EventDetail = () => {
                     <Grid item xs={12} sm={12} md={5.9} lg={5.9} xl={3.8} sx={{ marginBottom: 1 }}>
                         <Card
                             sx={{
+                                position: 'relative',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -369,7 +483,23 @@ const EventDetail = () => {
                                 image={featuredImageUri + event.event_image}
                                 alt="event poster"
                                 sx={{ width: '100%', height: '81%' }}
-                            ></CardMedia>
+                            />
+                            <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
+                                {cancelled != 1 && featured == 1 && (
+                                    <Box sx={{ background: theme.palette.background.default, padding: 1, borderBottomLeftRadius: 4 }}>
+                                        <Typography variant="h1">
+                                            <StarIcon sx={{ color: '#e29000' }} />
+                                        </Typography>
+                                    </Box>
+                                )}
+                                {cancelled == 1 && (
+                                    <Box sx={{ background: theme.palette.background.default, padding: 1, borderBottomLeftRadius: 10 }}>
+                                        <Typography variant="subtitle1" color="error">
+                                            Cancelled
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </Box>
                         </Card>
                     </Grid>
                     <Grid item xs={12} sm={12} md={5.9} lg={5.9} xl={3.8}>
@@ -396,6 +526,20 @@ const EventDetail = () => {
                                             {item.label}
                                         </MenuItem>
                                     ))}
+
+                                    {cancelled != 1 && (
+                                        <>
+                                            <Divider />
+                                            <MenuItem onClick={() => handleEventFeaturing(event.id)}>
+                                                Featured {featuring && <Loader />}{' '}
+                                            </MenuItem>
+                                        </>
+                                    )}
+                                    {cancelled != 1 && (
+                                        <MenuItem onClick={() => handleCancelEvent(event.id)}>
+                                            Cancel event {cancelling && <Loader />}
+                                        </MenuItem>
+                                    )}
                                 </Menu>
                             </Box>
 
@@ -403,26 +547,30 @@ const EventDetail = () => {
                             <Grid container display={'flex'} gap={5}>
                                 <Grid item>
                                     <Typography mt={1}>ID</Typography>
-                                    <Typography mt={1}>Status</Typography>
-                                    <Typography mt={1}> Added on</Typography>
-                                    <Typography mt={1}>Event Type</Typography>
+                                    <Typography mt={2}>Status</Typography>
+                                    <Typography mt={2}> Added on</Typography>
+                                    <Typography mt={2}>Event Type</Typography>
+                                    <Typography mt={2}>Rating</Typography>
                                 </Grid>
                                 <Grid>
                                     <Typography mt={1} fontWeight={theme.typography.fontWeightBold}>
                                         {event.id}
                                     </Typography>
                                     <Typography
-                                        mt={1}
+                                        mt={2}
                                         fontWeight={theme.typography.fontWeightBold}
                                         sx={{ color: EventStatus(statusOfEvent).statusColor }}
                                     >
                                         {EventStatus(statusOfEvent).literalStatus}
                                     </Typography>
-                                    <Typography mt={1} fontWeight={theme.typography.fontWeightBold}>
+                                    <Typography mt={2} fontWeight={theme.typography.fontWeightBold}>
                                         {DateFormater(event.created_at)}
                                     </Typography>
-                                    <Typography mt={1} fontWeight={theme.typography.fontWeightBold}>
+                                    <Typography mt={2} fontWeight={theme.typography.fontWeightBold}>
                                         {event.event_type}
+                                    </Typography>
+                                    <Typography mt={2} fontWeight={theme.typography.fontWeightBold}>
+                                        {event.rating} <StarIcon fontSize="22" sx={{ color: '#e29000' }} />
                                     </Typography>
                                 </Grid>
                             </Grid>

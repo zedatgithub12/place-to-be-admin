@@ -83,8 +83,8 @@ const Events = () => {
     return (
         <Grid container display={'flex'} flexDirection={'column'}>
             <Grid item m={1} display={'flex'} justifyContent="space-between">
-                <Typography variant="h2">Events</Typography>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/add-event')}>
+                <Typography variant="h3">Events</Typography>
+                <Button variant="contained" color="warning" startIcon={<AddIcon />} onClick={() => navigate('/add-event')}>
                     Add Events
                 </Button>
             </Grid>
@@ -104,43 +104,6 @@ const Events = () => {
                             <Search />
                         </IconButton>
                     </Paper>
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={6} lg={4} sx={{ marginLeft: { lg: 1 } }} display={'flex'}>
-                    <FormControl sx={{ m: 1, maxWidth: 120, marginLeft: { sm: 0 } }}>
-                        <Select id="organizer-option" value={organizer} onChange={(event) => handleOptionChange(event, setOrganizer)}>
-                            <MenuItem value={'all'}>Organizer</MenuItem>
-
-                            {Array.from(new Set(filteredEventsData.map((event) => event.event_organizer))).map((organizer) => (
-                                <MenuItem key={organizer} value={organizer}>
-                                    {organizer}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    <FormControl sx={{ m: 1, maxWidth: 120 }}>
-                        <Select id="organizer-option" value={category} onChange={(event) => handleOptionChange(event, setCategory)}>
-                            <MenuItem value={'all'}>Category</MenuItem>
-
-                            {Array.from(new Set(filteredEventsData.map((event) => event.category))).map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    <FormControl sx={{ m: 1, maxWidth: 120 }}>
-                        <Select id="organizer-option" value={eventtype} onChange={(event) => handleOptionChange(event, setEventType)}>
-                            <MenuItem value={'all'}>Event Type</MenuItem>
-                            {Array.from(new Set(filteredEventsData.map((event) => event.event_type))).map((eventtype) => (
-                                <MenuItem key={eventtype} value={eventtype}>
-                                    {eventtype}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
                 </Grid>
             </Grid>
             <Grid container sx={{ display: 'flex' }}>

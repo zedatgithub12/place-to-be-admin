@@ -233,7 +233,7 @@ const LeftEventPanel = ({ events, isLoading }) => {
                                         <TableCell align="right">{event.end_date}</TableCell>
                                         <TableCell align="right">
                                             <Typography
-                                                fontWeight={theme.typography.fontWeightBold}
+                                                fontWeight={theme.typography.fontWeightMedium}
                                                 sx={{ color: EventStatus(event.event_status).statusColor }}
                                             >
                                                 {EventStatus(event.event_status).literalStatus}

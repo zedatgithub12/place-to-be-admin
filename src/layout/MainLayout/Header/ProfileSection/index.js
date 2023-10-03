@@ -40,7 +40,7 @@ import { AuthContext } from 'context/context';
 const ProfileSection = () => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
-    const { SignOut } = useContext(AuthContext);
+    const { SignOut, getUser } = useContext(AuthContext);
     const navigate = useNavigate();
     const anchorRef = useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -142,10 +142,10 @@ const ProfileSection = () => {
                                             <Stack direction="row" spacing={0.5} alignItems="center">
                                                 <Typography variant="h4">Hello,</Typography>
                                                 <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                    Developer
+                                                    Someone
                                                 </Typography>
                                             </Stack>
-                                            <Typography variant="subtitle2">Frontend Developer</Typography>
+                                            <Typography variant="subtitle2">Editor</Typography>
                                         </Stack>
                                     </Box>
                                     <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
@@ -167,7 +167,7 @@ const ProfileSection = () => {
                                                     }
                                                 }}
                                             >
-                                                <ListItemButton
+                                                {/* <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                     selected={selectedIndex === 0}
                                                     onClick={(event) => handleListItemClick(event, 0, '/user/account-profile/profile1')}
@@ -176,7 +176,7 @@ const ProfileSection = () => {
                                                         <IconSettings stroke={1.5} size="1.3rem" />
                                                     </ListItemIcon>
                                                     <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
-                                                </ListItemButton>
+                                                </ListItemButton> */}
 
                                                 <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
