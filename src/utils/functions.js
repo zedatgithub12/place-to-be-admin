@@ -341,15 +341,15 @@ export function EventStatus(status) {
             literalStatus = 'Pending';
             statusColor = '#808080';
             break;
-        case 1:
+        case '1':
             literalStatus = 'Active';
             statusColor = '#00aa00';
             break;
-        case 2:
+        case '2':
             literalStatus = 'Declined';
             statusColor = '#ff0000';
             break;
-        case 3:
+        case '3':
             literalStatus = 'Cancelled';
             statusColor = '#aa0000';
             break;
