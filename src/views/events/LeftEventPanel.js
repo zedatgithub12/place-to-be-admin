@@ -29,7 +29,7 @@ const LeftEventPanel = ({ events, isLoading }) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const [page, setPage] = useState(0); //for pagination
-    const [rowsPerPage, setRowsPerPage] = useState(5); //for pagination
+    const [rowsPerPage, setRowsPerPage] = useState(15); //for pagination
 
     const [tabValue, setTabValue] = useState('one');
     const tabCounters = {
@@ -247,7 +247,7 @@ const LeftEventPanel = ({ events, isLoading }) => {
                 </TableContainer>
                 <TableFooter>
                     <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[15, 25, 50, 100]}
                         component="div"
                         count={filteredEvents.length}
                         rowsPerPage={rowsPerPage}

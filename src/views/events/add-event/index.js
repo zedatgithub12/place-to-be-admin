@@ -19,7 +19,8 @@ import {
     FormControl,
     InputLabel,
     MenuItem,
-    useTheme
+    useTheme,
+    CircularProgress
 } from '@mui/material';
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router';
@@ -29,6 +30,7 @@ import GoogleMapReact from 'google-map-react';
 import pin from 'assets/icons/marker.svg';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Loader from 'ui-component/Loader';
 
 // ==============================|| EVENT ADDING PAGE ||============================== //
 
@@ -47,11 +49,10 @@ const AddEvent = () => {
     const theme = useTheme();
     const fileInputRef = useRef(null);
 
-    const userId = async () => sessionStorage.getItem('user');
     const [activeAccordion, setActiveAccordion] = useState(0);
     const [posterPreview, setPosterPreview] = useState(null);
     const [selectedLocation, setSelectedLocation] = useState({ lat: null, lng: null });
-
+    const [isAdding, setIsAdding] = useState(false);
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -77,8 +78,8 @@ const AddEvent = () => {
         startTime: '',
         endTime: '',
         eventAddress: '',
-        latitude: '',
-        longitude: '',
+        latitude: '8.9919489',
+        longitude: '38.7385058',
         eventCategory: '',
         eventType: 'free',
         regularPrice: '',
@@ -88,10 +89,12 @@ const AddEvent = () => {
         buttonLabel: 'register',
         poster: null
     });
+
     const handleMapClick = ({ lat, lng }) => {
         setSelectedLocation({ lat, lng });
         setFormData({ ...formData, latitude: lat, longitude: lng });
     };
+
     const handleResetClick = (index) => () => {
         let updatedFormData = { ...formData };
 
@@ -144,9 +147,9 @@ const AddEvent = () => {
 
     const handleOnSubmit = async (e) => {
         e.preventDefault();
-
+        setIsAdding(true);
         const userId = sessionStorage.getItem('user');
-        var id = userId.id;
+        var id = JSON.parse(userId).id;
 
         const data = new FormData();
         data.append('userId', id);
@@ -176,6 +179,7 @@ const AddEvent = () => {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
+                    setIsAdding(false);
                     setPopup({
                         ...popup,
                         status: true,
@@ -183,6 +187,7 @@ const AddEvent = () => {
                         message: response.message
                     });
                 } else {
+                    setIsAdding(false);
                     setPopup({
                         ...popup,
                         status: true,
@@ -192,6 +197,7 @@ const AddEvent = () => {
                 }
             })
             .catch((error) => {
+                setIsAdding(false);
                 setPopup({
                     ...popup,
                     status: true,
@@ -606,7 +612,11 @@ const AddEvent = () => {
                                                     size="small"
                                                     sx={{ bgcolor: '#0065DB', width: '138px', height: '33px' }}
                                                 >
-                                                    Post
+                                                    {isAdding ? (
+                                                        <CircularProgress size={18} sx={{ color: theme.palette.background.default }} />
+                                                    ) : (
+                                                        ' Post'
+                                                    )}
                                                 </Button>
                                             </Box>
                                         </Grid>
