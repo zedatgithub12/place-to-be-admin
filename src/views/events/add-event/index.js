@@ -7,8 +7,6 @@ import {
     Button,
     Divider,
     Card,
-    Tabs,
-    Tab,
     Accordion,
     AccordionSummary,
     AccordionDetails,
@@ -27,11 +25,16 @@ import { useNavigate } from 'react-router';
 import Connections from 'api';
 import placeholder from 'assets/images/placeholder.jpg';
 import GoogleMapReact from 'google-map-react';
+import { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import pin from 'assets/icons/marker.svg';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import Loader from 'ui-component/Loader';
-
+import EventLocation from './components/EventLocation';
+import Category from 'data/category';
+import { Constants } from 'constants';
+import { IconAlarm, IconCircleCheck, IconClock, IconInfoCircle, IconX } from '@tabler/icons';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 // ==============================|| EVENT ADDING PAGE ||============================== //
 
 const Alert = forwardRef(function Alert(props, ref) {
@@ -51,8 +54,11 @@ const AddEvent = () => {
 
     const [activeAccordion, setActiveAccordion] = useState(0);
     const [posterPreview, setPosterPreview] = useState(null);
-    const [selectedLocation, setSelectedLocation] = useState({ lat: null, lng: null });
+    const [selectedLocation, setSelectedLocation] = useState({ lat: '', lng: '' });
     const [isAdding, setIsAdding] = useState(false);
+    const [submissionOne, setSubmissionOne] = useState('pending');
+    const [submissionTwo, setSubmissionTwo] = useState('pending');
+
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -77,22 +83,39 @@ const AddEvent = () => {
         endDate: '',
         startTime: '',
         endTime: '',
+        eventorganizer: '',
         eventAddress: '',
         latitude: '8.9919489',
         longitude: '38.7385058',
-        eventCategory: '',
+        eventCategory: 'Entertainment',
         eventType: 'free',
         regularPrice: '',
         phone: '',
         phone2: '',
         linkUrl: '',
-        buttonLabel: 'register',
+        buttonLabel: '',
         poster: null
     });
+    const [address, setAddress] = useState('');
 
     const handleMapClick = ({ lat, lng }) => {
         setSelectedLocation({ lat, lng });
         setFormData({ ...formData, latitude: lat, longitude: lng });
+    };
+
+    const handleChange = (value) => {
+        setAddress(value);
+    };
+
+    const handleSelect = async (value) => {
+        const results = await geocodeByAddress(value);
+        const latLng = await getLatLng(results[0]);
+        var lat = latLng.lat;
+        var lng = latLng.lng;
+
+        setSelectedLocation({ lat, lng });
+        setFormData({ ...formData, latitude: latLng.lat, longitude: latLng.lng });
+        setAddress(value);
     };
 
     const handleResetClick = (index) => () => {
@@ -148,6 +171,7 @@ const AddEvent = () => {
     const handleOnSubmit = async (e) => {
         e.preventDefault();
         setIsAdding(true);
+        setSubmissionOne('processing');
         const userId = sessionStorage.getItem('user');
         var id = JSON.parse(userId).id;
 
@@ -166,8 +190,8 @@ const AddEvent = () => {
         data.append('longitude', selectedLocation.lng);
         data.append('contact_phone', formData.phone);
         data.append('contact_phone_2', formData.phone2);
-        data.append('link_label', formData.link_label);
-        data.append('redirectUrl', formData.redirectUrl);
+        data.append('link_label', formData.buttonLabel);
+        data.append('redirectUrl', formData.linkUrl);
         data.append('event_type', formData.eventType);
         data.append('event_entrance_fee', formData.regularPrice);
 
@@ -179,15 +203,11 @@ const AddEvent = () => {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    setIsAdding(false);
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'success',
-                        message: response.message
-                    });
+                    setSubmissionOne('succeed');
+                    PostingMiddleware();
                 } else {
-                    setIsAdding(false);
+                    setSubmissionOne('failed');
+
                     setPopup({
                         ...popup,
                         status: true,
@@ -197,13 +217,96 @@ const AddEvent = () => {
                 }
             })
             .catch((error) => {
-                setIsAdding(false);
+                setSubmissionOne('failed');
                 setPopup({
                     ...popup,
                     status: true,
                     severity: 'error',
                     message: error.message
                 });
+            });
+    };
+
+    const PostingMiddleware = async () => {
+        await UploadImageOnOld();
+    };
+
+    const PostOnOldPlatform = async (filename) => {
+        // we retrived usertoken from async storage and store it in global scope
+        const userId = sessionStorage.getItem('user');
+        var id = JSON.parse(userId).id;
+
+        // After this we initiate featch method to send user data to database
+        var InsertAPIUrl = 'https://app.p2b-ethiopia.com/placetobe/AddEvent.php';
+        // header type for text data to be send to server
+        var headers = {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // data to be stored in the database
+        var Data = {
+            userId: id,
+            picture: filename,
+            name: formData.title,
+            about: formData.description,
+            startD: formData.startDate,
+            startT: formData.startTime,
+            endD: formData.endDate,
+            eTime: formData.endTime,
+            eventOrganizers: formData.eventorganizer,
+            eventCategories: formData.eventCategory,
+            eventVenuesAddress: formData.eventAddress,
+            eventFee: formData.regularPrice,
+            latitude: formData.latitude,
+            longitude: formData.longitude,
+            organizerPhone: formData.phone,
+            redirectUrl: formData.linkUrl,
+            status: '0'
+        };
+        // fetch function
+        fetch(InsertAPIUrl, {
+            method: 'POST', // method used to store data in the database
+            headers: headers, // header type which we declare on the top will be assign to headers
+            body: JSON.stringify(Data) // a data will be converted to json format
+        })
+            .then((response) => response.json()) //check response type of the API
+            .then((response) => {
+                let returnedResponse = response[0];
+                let message = returnedResponse.message;
+                if (message === 'successfully Added') {
+                    setSubmissionTwo('succeed');
+                } else {
+                    setSubmissionTwo('failed');
+                }
+            })
+            .catch((err) => {
+                setSubmissionTwo('failed');
+            });
+    };
+
+    const UploadImageOnOld = async () => {
+        setSubmissionTwo('processing');
+        const poster = formData.poster;
+        //the url which the image will be sent to
+        var ApiUrl = 'https://app.p2b-ethiopia.com/placetobe/uploadPoster.php';
+        const data = new FormData();
+        // Assume "photo" is the name of the form field the server expects
+
+        data.append('photo', poster);
+
+        fetch(ApiUrl, {
+            method: 'POST', //request method
+            body: data // data to be sent to server
+        })
+            .then((response) => response.json()) //check response type of the API
+            .then((response) => {
+                let message = response.message;
+                if (message === 'Image uploaded successfully') {
+                    PostOnOldPlatform(response.filename);
+                    setSubmissionTwo('processing');
+                } else {
+                    setSubmissionTwo('failed');
+                }
             });
     };
 
@@ -274,17 +377,16 @@ const AddEvent = () => {
                                                     <label htmlFor="event-poster">
                                                         <div>
                                                             {posterPreview ? (
-                                                                <Box>
+                                                                <Box sx={{}}>
                                                                     <img
                                                                         src={posterPreview}
                                                                         alt="poster"
                                                                         style={{
-                                                                            width: 400,
-                                                                            maxWidth: 600,
-                                                                            height: 400,
-                                                                            maxHeight: 600,
+                                                                            width: 300,
+                                                                            height: 300,
+                                                                            objectFit: 'contain',
                                                                             aspectRatio: 1,
-                                                                            resize: 'cover',
+                                                                            resize: 'contain',
                                                                             borderRadius: 6
                                                                         }}
                                                                     />
@@ -301,9 +403,8 @@ const AddEvent = () => {
                                                                         src={placeholder}
                                                                         alt="Poster"
                                                                         style={{
-                                                                            width: 400,
-                                                                            height: 400,
                                                                             aspectRatio: 1,
+                                                                            objectFit: 'contain',
                                                                             resize: 'contain'
                                                                         }}
                                                                     />
@@ -343,7 +444,6 @@ const AddEvent = () => {
                                                         style={{ marginTop: 2 }}
                                                         multiline
                                                         rows={4}
-                                                        maxRows={20}
                                                         required
                                                         value={formData.description}
                                                         onChange={(e) => handleFieldChange('description', e.target.value)}
@@ -478,14 +578,22 @@ const AddEvent = () => {
                                                 </Box>
                                                 <Box display={'flex'} flexDirection={'column'} sx={{ flex: 1 }}>
                                                     <Typography variant="h5">Event Category</Typography>
-                                                    <TextField
-                                                        value={formData.eventCategory}
-                                                        onChange={(e) => handleFieldChange('eventCategory', e.target.value)}
-                                                        style={{ marginTop: 5 }}
-                                                        size="small"
-                                                        fullWidth
-                                                        required
-                                                    />
+
+                                                    <FormControl size="small" sx={{ marginTop: 0.7 }}>
+                                                        <Select
+                                                            value={formData.eventCategory}
+                                                            onChange={(e) => handleFieldChange('eventCategory', e.target.value)}
+                                                            fullWidth
+                                                            required
+                                                        >
+                                                            {Category.map((item, index) => (
+                                                                <MenuItem key={index} value={item.name}>
+                                                                    {item.name}
+                                                                </MenuItem>
+                                                            ))}
+                                                        </Select>
+                                                    </FormControl>
+
                                                     <Typography variant="h5" mt={2}>
                                                         Regular Ticket Price
                                                     </Typography>
@@ -500,14 +608,23 @@ const AddEvent = () => {
                                             </Box>
 
                                             <Grid item xs={12} sx={{ padding: 2, marginY: 1, borderRadius: 6 }}>
-                                                <Typography sx={{ paddingBottom: 1 }}>Select location on the map</Typography>
-                                                <Box sx={{ height: 400, width: '100%' }}>
+                                                <Typography>Select address on the map</Typography>
+
+                                                <Box sx={{ borderRadius: 8, height: 400, width: '100%' }}>
+                                                    <Box sx={{}}>
+                                                        <EventLocation
+                                                            apiKey="GBJmOb_KZsptY1uVEGOq3k2Y_bgs8"
+                                                            address={address}
+                                                            handleChange={handleChange}
+                                                            handleSelect={handleSelect}
+                                                        />
+                                                    </Box>
                                                     <GoogleMapReact
-                                                        defaultCenter={{ lat: 9.0108, lng: 38.7617 }} // Set the default center of the map
-                                                        defaultZoom={12} // Set default zoom level
-                                                        onClick={handleMapClick} // Call handleMapClick function when the map is clicked
+                                                        defaultZoom={12}
+                                                        center={selectedLocation}
+                                                        zoom={14}
+                                                        onClick={handleMapClick}
                                                     >
-                                                        {/* Marker to show the selected location */}
                                                         {selectedLocation.lat && selectedLocation.lng && (
                                                             <Marker lat={selectedLocation.lat} lng={selectedLocation.lng} />
                                                         )}
@@ -515,7 +632,7 @@ const AddEvent = () => {
                                                 </Box>
                                             </Grid>
 
-                                            <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'end', mt: 8 }}>
                                                 <Button
                                                     variant="text"
                                                     sx={{ color: '#1E1E1E', width: '61px', height: '25px' }}
@@ -612,11 +729,7 @@ const AddEvent = () => {
                                                     size="small"
                                                     sx={{ bgcolor: '#0065DB', width: '138px', height: '33px' }}
                                                 >
-                                                    {isAdding ? (
-                                                        <CircularProgress size={18} sx={{ color: theme.palette.background.default }} />
-                                                    ) : (
-                                                        ' Post'
-                                                    )}
+                                                    Post
                                                 </Button>
                                             </Box>
                                         </Grid>
@@ -640,6 +753,89 @@ const AddEvent = () => {
                     </Grid>
                 </Grid>
             </Grid>
+
+            {isAdding && (
+                <Box
+                    sx={{
+                        minWidth: 380,
+                        minHeight: 200,
+                        backgroundColor: theme.palette.background.default,
+                        boxShadow: 2,
+                        position: 'fixed',
+                        bottom: 18,
+                        right: 20,
+                        padding: 3,
+                        borderRadius: 2
+                    }}
+                >
+                    <IconButton sx={{ position: 'absolute', top: 4, right: 4 }} onClick={() => setIsAdding(false)}>
+                        <IconX size={20} />
+                    </IconButton>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            paddingX: 1,
+                            paddingY: 1,
+                            marginTop: 3
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                            <Typography
+                                variant="h4"
+                                sx={{ color: submissionOne === 'pending' ? theme.palette.grey[500] : theme.palette.grey[800] }}
+                            >
+                                Submission to the new platfrom{' '}
+                            </Typography>
+                        </Box>
+
+                        {submissionOne === 'processing' ? (
+                            <CircularProgress size={20} />
+                        ) : submissionOne === 'succeed' ? (
+                            <CheckCircleIcon fontSize="small" color="success" />
+                        ) : submissionOne === 'failed' ? (
+                            <ErrorIcon fontSize="small" color="error" />
+                        ) : (
+                            <IconClock size={20} color="grey" />
+                        )}
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            paddingX: 1,
+                            paddingY: 1,
+                            marginTop: 3
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                            <Typography
+                                variant="h4"
+                                sx={{ color: submissionTwo === 'pending' ? theme.palette.grey[500] : theme.palette.grey[800] }}
+                            >
+                                Submission to the old platfrom{' '}
+                            </Typography>
+                        </Box>
+
+                        {submissionTwo === 'processing' ? (
+                            <CircularProgress size={20} />
+                        ) : submissionTwo === 'succeed' ? (
+                            <CheckCircleIcon fontSize="small" color="success" />
+                        ) : submissionTwo === 'failed' ? (
+                            <ErrorIcon fontSize="small" color="error" />
+                        ) : (
+                            <IconClock size={20} color="grey" />
+                        )}
+                    </Box>
+                </Box>
+            )}
+
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}

@@ -130,7 +130,7 @@ const EventDetail = () => {
             lat: 8.9806,
             lng: 38.7578
         },
-        zoom: 11
+        zoom: 14
     };
     const checkCoords = (latlng) => {
         var latitude = latlng.address_latitude;

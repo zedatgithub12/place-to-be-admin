@@ -1,7 +1,7 @@
 const Connections = {
-    // api: 'http://192.168.100.3:8000/api/',
+    // api: 'http://localhost:8000/api/',
     api: 'https://backend.placetobeethiopia.com/api/', //remote server api endpoint
-    url: 'https://backend.placetobeethiopia.com/api/',
+    // url: 'https://backend.placetobeethiopia.com/api/',
 
     //admin dashboard end points
     adminsignin: 'adminsignin',

@@ -20,7 +20,6 @@ import {
     TableFooter
 } from '@mui/material';
 
-import { MoreVert } from '@mui/icons-material';
 import { P2bProgress } from 'utils/spinners';
 import './eventStyle.css';
 import { EventStatus } from 'utils/functions';
@@ -29,7 +28,7 @@ const LeftEventPanel = ({ events, isLoading }) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const [page, setPage] = useState(0); //for pagination
-    const [rowsPerPage, setRowsPerPage] = useState(15); //for pagination
+    const [rowsPerPage, setRowsPerPage] = useState(50); //for pagination
 
     const [tabValue, setTabValue] = useState('one');
     const tabCounters = {
